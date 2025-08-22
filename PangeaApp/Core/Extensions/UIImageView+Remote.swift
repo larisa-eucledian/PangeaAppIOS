@@ -1,0 +1,7 @@
+//
+//  UIImageViewURLExtension.swift
+//  PangeaApp
+//
+//  Created by Larisa Clemenceau on 18/08/25.
+//
+

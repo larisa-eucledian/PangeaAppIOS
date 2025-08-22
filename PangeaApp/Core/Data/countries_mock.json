@@ -1,0 +1,52 @@
+[
+  {
+    "id": 82,
+    "documentId": "ttey6mdwq02e5sx05ve1dgdo",
+    "country_code": "FR",
+    "country_name": "France",
+    "region": "Europe",
+    "image_url": "https://flagcdn.com/w320/fr.png",
+    "languages": { "fra": "French" },
+    "currencies": { "EUR": { "name": "Euro", "symbol": "€" } },
+    "callingCodes": ["+33"],
+    "geography": "local",
+    "covered_countries": null
+  },
+  {
+    "id": 151,
+    "documentId": "gae4aza4f7oz6044crtsz3tj",
+    "country_code": "MX",
+    "country_name": "Mexico",
+    "region": "Americas",
+    "image_url": "https://flagcdn.com/w320/mx.png",
+    "languages": { "spa": "Spanish" },
+    "currencies": { "MXN": { "name": "Mexican peso", "symbol": "$" } },
+    "callingCodes": ["+52"],
+    "geography": "local",
+    "covered_countries": null
+  },
+  {
+    "id": 75,
+    "documentId": "tfxs5u645rwljghy4tocamh3",
+    "country_code": "EU",
+    "country_name": "Europe",
+    "geography": "regional",
+    "covered_countries": ["AT","BE","BG","HR","CY","CZ","DK","EE","FI","FR","DE","GR","HU","IS","IE","IT","LV","LI","LT","LU","MT","NL","NO","PL","PT","RO","SK","SI","ES","SE","CH","GB"]
+  },
+  {
+    "id": 170,
+    "documentId": "l4lcokgtlw88upk0nzb4krcc",
+    "country_code": "NAM",
+    "country_name": "North America",
+    "geography": "regional",
+    "covered_countries": ["US","CA","MX"]
+  },
+  {
+    "id": 91,
+    "documentId": "uxbno9sm9ljz8ndmqu7ig8ml",
+    "country_code": "GLO",
+    "country_name": "Global",
+    "geography": "global",
+    "covered_countries": [ "AL","DZ","AD","AI","AR","AM","AU","AT","AZ","BH","BD","BB","BY","BE","BA","BR","VG","BG","CA","KY","TD","CN","CO","CG","HR","CY","CZ","CD","DK","DM","EG","SV","EE","FO","FI","FR","GF","GA","GE","DE","GH","GI","GR","GD","GP","GG","GY","HK","HU","IS","IN","ID","IQ","IE","IL","IM","IT","JM","JP","JE","JO","KZ","KE","XK","KW","KG","LV","LI","LT","LU","MO","MK","MG","MW","MY","MT","MX","MD","ME","MA","MS","NP","NL","NZ","NE","NG","NO","PK","PY","PH","PL","PT","QA","RE","RO","RU","KN","LC","VC","SA","RS","SG","SK","SI","KR","ES","LK","SR","SE","CH","TW","TZ","TH","TT","TN","TR","TC","UG","UA","AE","GB","US","UZ","VN"]
+  }
+]
