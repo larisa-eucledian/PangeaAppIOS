@@ -5,3 +5,51 @@
   Created by Larisa Clemenceau on 18/08/25.
   
 */
+tab.explore = "Explore";
+tab.myesims = "My eSIMs";
+tab.settings = "Settings";
+title.countries = "Explore";
+title.packages = "Packages";
+title.myesims = "My eSIMs";
+title.settings = "Settings";
+
+countries.mode.single = "One country";
+countries.mode.multi  = "Multiple countries";
+
+search.countries.placeholder = "Search for a country";
+search.packages.placeholder  = "Filter by text";
+
+country.includes_countries = "Includes %d countries";
+country.packages_available  = "Packages available";
+
+filters.all         = "All";
+filters.only_data   = "Data only";
+filters.data_calls  = "Data + Calls/SMS";
+filters.unlimited   = "Unlimited Data";
+
+plan.only_data        = "Data only";
+plan.data_calls       = "Data + Calls/SMS";
+plan.unlimited_data   = "Unlimited Data";
+
+unit.gb         = "%d GB";
+unit.mb         = "%d MB";
+unit.days.short = "%d d";
+unit.days.long  = "%d days";
+
+feature.data     = "Data";
+feature.calls    = "Calls";
+feature.sms      = "SMS";
+feature.hotspot  = "Hotspot";
+feature.unlimited = "Unlimited";
+
+speed.max_available = "Maximum available speed";
+speed.limited_to    = "Speed up to %@";
+speed.reduced_to    = "After usage, speed to %@";
+
+settings.tutorials = "Tutorials";
+settings.faqs      = "FAQs";
+settings.logout    = "Log out";
+settings.profile   = "User profile";
+
+myesims.empty.title    = "You don’t have eSIMs yet";
+myesims.empty.subtitle = "Buy an eSIM to see it here";

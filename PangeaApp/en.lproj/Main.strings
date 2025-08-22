@@ -1,60 +1,44 @@
+"7Fa-bS-e7h.placeholder" = "Search for a country";
+"9Am-0y-ey9.text" = "Country";
+"BTQ-we-wm7.title" = "Explore";
+"Cg8-bx-9cL.title" = "My eSIMs";
 
-/* Class = "UISearchBar"; placeholder = "Escribe un país"; ObjectID = "7Fa-bS-e7h"; */
-"7Fa-bS-e7h.placeholder" = "Escribe un país";
-
-/* Class = "UILabel"; text = "CountryLabel"; ObjectID = "9Am-0y-ey9"; */
-"9Am-0y-ey9.text" = "CountryLabel";
-
-/* Class = "UINavigationItem"; title = "Explora Destinos"; ObjectID = "BTQ-we-wm7"; */
-"BTQ-we-wm7.title" = "Explora Destinos";
-
-/* Class = "UITabBarItem"; title = "Mis eSIMs"; ObjectID = "Cg8-bx-9cL"; */
-"Cg8-bx-9cL.title" = "Mis eSIMs";
-
-/* Class = "UIButton"; configuration.title = "Data & Calls"; ObjectID = "Co5-qL-Alh"; */
+/* Button “Data & Calls” */
 "Co5-qL-Alh.configuration.title" = "Data & Calls";
+/* Optional, can remove if using configuration.title */
+"Co5-qL-Alh.normalTitle" = "Data & Calls";
 
-/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "Co5-qL-Alh"; */
-"Co5-qL-Alh.normalTitle" = "Button";
+"F2N-TY-OXm.text" = "Subtitle";
 
-/* Class = "UILabel"; text = "subtitle"; ObjectID = "F2N-TY-OXm"; */
-"F2N-TY-OXm.text" = "subtitle";
+/* Button “Unlimited Data” */
+"Hgo-Fd-uVy.configuration.title" = "Unlimited Data";
+/* Optional */
+"Hgo-Fd-uVy.normalTitle" = "Unlimited Data";
 
-/* Class = "UIButton"; configuration.title = "Unilimted Data"; ObjectID = "Hgo-Fd-uVy"; */
-"Hgo-Fd-uVy.configuration.title" = "Unilimted Data";
+"OqW-3d-eCt.text" = "Package info";
 
-/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "Hgo-Fd-uVy"; */
-"Hgo-Fd-uVy.normalTitle" = "Button";
+"xso-TU-gmF.title" = "Settings";
 
-/* Class = "UILabel"; text = "PackageInfo"; ObjectID = "OqW-3d-eCt"; */
-"OqW-3d-eCt.text" = "PackageInfo";
+"XCK-8d-H4K.text" = "Title";
 
-/* Class = "UITabBarItem"; title = "Ajustes"; ObjectID = "SpH-0X-daZ"; */
-"SpH-0X-daZ.title" = "Ajustes";
+"dSS-Qz-nkr.text" = "You don’t have eSIMs";
 
-/* Class = "UILabel"; text = "title"; ObjectID = "XCK-8d-H4K"; */
-"XCK-8d-H4K.text" = "title";
+"fnn-bl-M00.segmentTitles[0]" = "Single country";
+"fnn-bl-M00.segmentTitles[1]" = "Multiple countries";
 
-/* Class = "UILabel"; text = "No tienes eSIMs"; ObjectID = "dSS-Qz-nkr"; */
-"dSS-Qz-nkr.text" = "No tienes eSIMs";
+"lV8-iS-Pck.title" = "Explore";
 
-/* Class = "UISegmentedControl"; fnn-bl-M00.segmentTitles[0] = "Un País"; ObjectID = "fnn-bl-M00"; */
-"fnn-bl-M00.segmentTitles[0]" = "Un País";
-
-/* Class = "UISegmentedControl"; fnn-bl-M00.segmentTitles[1] = "Varíos Países"; ObjectID = "fnn-bl-M00"; */
-"fnn-bl-M00.segmentTitles[1]" = "Varíos Países";
-
-/* Class = "UITabBarItem"; title = "Explora"; ObjectID = "lV8-iS-Pck"; */
-"lV8-iS-Pck.title" = "Explora";
-
-/* Class = "UILabel"; text = "Price"; ObjectID = "ti1-8J-mV2"; */
 "ti1-8J-mV2.text" = "Price";
+"vPi-yX-PgP.text" = "Package name";
 
-/* Class = "UILabel"; text = "PackageName"; ObjectID = "vPi-yX-PgP"; */
-"vPi-yX-PgP.text" = "PackageName";
-
-/* Class = "UIButton"; configuration.title = "Only Data"; ObjectID = "waQ-6M-T3y"; */
-"waQ-6M-T3y.configuration.title" = "Only Data";
-
-/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "waQ-6M-T3y"; */
-"waQ-6M-T3y.normalTitle" = "Button";
+"waQ-6M-T3y.configuration.title" = "Data only";
+/* Optional */
+"waQ-6M-T3y.normalTitle" = "Data only";
+"sWK-xl-sGk.headerTitle" = "ACCOUNT";
+"FPm-5h-Dc3.text" = "User Profile";
+"eqo-P7-p09.text" = "Change language";
+"eEA-yt-4FS.headerTitle" = "HELP";
+"vfF-fa-kO5.text" = "Guides & Tutorials";
+"DnL-za-zQe.text" = "Frequently Asked Questions";
+"N9q-wT-fNW.text" = "Support";
+"MQs-TJ-QuQ.text" = "Cerrar Sesión";

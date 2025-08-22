@@ -5,3 +5,51 @@
   Created by Larisa Clemenceau on 18/08/25.
   
 */
+tab.explore = "Explora Destinos";
+tab.myesims = "Mis eSIMs";
+tab.settings = "Ajustes";
+title.countries = "Explora";
+title.packages = "Paquetes";
+title.myesims = "Mis eSIMs";
+title.settings = "Ajustes";
+
+countries.mode.single = "Un país";
+countries.mode.multi  = "Varios países";
+
+search.countries.placeholder = "Busca un país";
+search.packages.placeholder  = "Filtra por texto";
+
+country.includes_countries = "Incluye %d países";
+country.packages_available  = "Paquetes disponibles";
+
+filters.all         = "Todos";
+filters.only_data   = "Solo datos";
+filters.data_calls  = "Datos + Llamadas/SMS";
+filters.unlimited   = "Datos ilimitados";
+
+plan.only_data        = "Solo datos";
+plan.data_calls       = "Datos + Llamadas/SMS";
+plan.unlimited_data   = "Datos ilimitados";
+
+unit.gb         = "%d GB";
+unit.mb         = "%d MB";
+unit.days.short = "%d d";
+unit.days.long  = "%d días";
+
+feature.data     = "Datos";
+feature.calls    = "Llamadas";
+feature.sms      = "SMS";
+feature.hotspot  = "Hotspot";
+feature.unlimited = "Ilimitado";
+
+speed.max_available = "Velocidad máxima disponible";
+speed.limited_to    = "Velocidad hasta %@";
+speed.reduced_to    = "Al agotar, velocidad a %@";
+
+settings.tutorials = "Tutoriales";
+settings.faqs      = "Preguntas frecuentes";
+settings.logout    = "Cerrar sesión";
+settings.profile   = "Perfil de usuario";
+
+myesims.empty.title    = "Aún no tienes eSIMs";
+myesims.empty.subtitle = "Compra una eSIM para verla aquí";
