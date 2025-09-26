@@ -29,6 +29,7 @@ final class PlanSearchViewController: UIViewController, UITableViewDelegate, UIS
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        setNavBarLogo()
 
         if repository == nil {
            repository = AppDependencies.shared.plansRepository
@@ -55,7 +56,6 @@ final class PlanSearchViewController: UIViewController, UITableViewDelegate, UIS
                modeSegmented.selectedSegmentIndex = 0
                fetchAndRender()
         
-            // Fondo
             view.backgroundColor = AppColor.background
             countriesTableView.backgroundColor = .clear
             countriesTableView.separatorColor = AppColor.border
@@ -67,7 +67,7 @@ final class PlanSearchViewController: UIViewController, UITableViewDelegate, UIS
                 .foregroundColor: AppColor.textPrimary
             ], for: .normal)
             modeSegmented.setTitleTextAttributes([
-                .foregroundColor: AppColor.background   // texto blanco sobre primario
+                .foregroundColor: AppColor.background
             ], for: .selected)
 
             // UISearchBar
@@ -78,7 +78,7 @@ final class PlanSearchViewController: UIViewController, UITableViewDelegate, UIS
                 string: tf.placeholder ?? "",
                 attributes: [.foregroundColor: AppColor.textMuted]
             )
-            searchBar.tintColor = AppColor.primary  // cursor y botón clear
+            searchBar.tintColor = AppColor.primary  
 
            }
 
@@ -102,7 +102,7 @@ final class PlanSearchViewController: UIViewController, UITableViewDelegate, UIS
 
     private func fetchAndRender() {
             Task {
-                guard let repo = repository else { return } // ⬅️ asegúrate
+                guard let repo = repository else { return }
                 do {
                     var list = try await repo.fetchCountries(
                         geography: mode == .single ? .local : nil,

@@ -5,16 +5,13 @@ import Foundation
 final class AppDependencies {
     static let shared = AppDependencies()
 
-    // Cambia a false cuando conectes el repo real
-    private let useMock = true
-
-    // Repos/Servicios compartidos
     lazy var plansRepository: PlansRepository = {
-        #if DEBUG
-        if useMock { return MockPlansRepository() }
-        #endif
-        // TODO: Cambiar por el repo real cuando lo implementes
-        return MockPlansRepository() // Placeholder hasta tener RemotePlansRepository
+        return MockPlansRepository()
+    }()
+
+    lazy var authRepository: AuthRepository = {
+        // TODO: Cambiar a RealAuthRepository cuando conectemos API real
+        return MockAuthRepository(ttlSeconds: 60 * 60) 
     }()
 
     private init() {}

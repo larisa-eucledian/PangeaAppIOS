@@ -1,5 +1,5 @@
 //
-//  AuthErrors.swift
+//  AuthError.swift
 //  PangeaApp
 //
 //  Created by Larisa Clemenceau on 26/09/25.

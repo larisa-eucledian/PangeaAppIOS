@@ -53,3 +53,37 @@ settings.profile   = "Perfil de usuario";
 
 myesims.empty.title    = "Aún no tienes eSIMs";
 myesims.empty.subtitle = "Compra una eSIM para verla aquí";
+
+/* Login */
+auth.login.title = "Iniciar sesión";
+auth.email.placeholder = "Correo electrónico";
+auth.password.placeholder = "Contraseña";
+auth.login.button = "Iniciar sesión";
+auth.register.cta = "Crear cuenta";
+app.logo = "Logo de la app";
+
+auth.register.title = "Crear cuenta";
+auth.name.placeholder = "Nombre de usuario";
+auth.password.confirm.placeholder = "Confirmar contraseña";
+auth.register.button = "Crear cuenta";
+
+auth.error.empty_email = "Ingresa tu correo.";
+auth.error.invalid_email = "El formato del correo no es válido.";
+auth.error.empty_password = "Ingresa tu contraseña.";
+auth.error.short_password = "La contraseña debe tener al menos %d caracteres.";
+auth.error.empty_name = "Ingresa tu nombre de usuario.";
+auth.error.short_name = "El nombre de usuario es demasiado corto.";
+auth.error.password_mismatch = "Las contraseñas no coinciden.";
+
+auth.error.network = "No se pudo conectar con el servidor.";
+auth.error.unauthorized = "Sesión expirada. Inicia sesión de nuevo.";
+auth.error.invalid_credentials = "Correo o contraseña incorrectos.";
+auth.error.email_in_use = "Este correo ya está registrado.";
+auth.error.decoding = "Error procesando datos.";
+auth.error.no_data = "No se recibieron datos del servidor.";
+auth.error.server = "Error interno. Inténtalo más tarde.";
+
+settings.logout.title = "Cerrar sesión";
+settings.logout.message = "¿Seguro que quieres cerrar sesión?";
+settings.logout.confirm = "Cerrar sesión";
+common.cancel = "Cancelar";

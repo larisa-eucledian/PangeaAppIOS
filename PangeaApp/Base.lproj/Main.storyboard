@@ -322,6 +322,21 @@
             </objects>
             <point key="canvasLocation" x="-349" y="-815"/>
         </scene>
+        <!--Login View Controller-->
+        <scene sceneID="wWa-Lj-bND">
+            <objects>
+                <viewController storyboardIdentifier="LoginViewController" id="jye-lT-OuX" customClass="LoginViewController" customModule="PangeaApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Shx-bf-rau">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="QMw-y9-h7N"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="VM4-g9-CGn" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-2625" y="422"/>
+        </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="tqx-Fa-8qn">
             <objects>
@@ -344,7 +359,7 @@
         <!--Settings-->
         <scene sceneID="ORr-jI-ShC">
             <objects>
-                <tableViewController id="Jef-w3-aEz" sceneMemberID="viewController">
+                <tableViewController id="Jef-w3-aEz" customClass="SettingsViewController" customModule="PangeaApp" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" estimatedSectionHeaderHeight="-1" sectionFooterHeight="18" estimatedSectionFooterHeight="-1" id="4QF-bg-M4D">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -495,10 +510,13 @@
                         </connections>
                     </tableView>
                     <tabBarItem key="tabBarItem" title="Settings" image="gear" catalog="system" id="xso-TU-gmF"/>
+                    <connections>
+                        <outlet property="logoutCell" destination="h8g-42-Y9z" id="8xj-tr-Kg3"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="f1V-2T-HKu" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-484" y="782"/>
+            <point key="canvasLocation" x="772" y="794"/>
         </scene>
         <!--Explore-->
         <scene sceneID="lTd-SI-Fno">

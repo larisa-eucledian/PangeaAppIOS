@@ -58,6 +58,7 @@ final class PackagesViewController: UIViewController, UISearchResultsUpdating, U
 
         override func viewDidLoad() {
             super.viewDidLoad()
+            setNavBarLogo()
 
             if repository == nil {
                 repository = AppDependencies.shared.plansRepository
@@ -180,7 +181,7 @@ final class PackagesViewController: UIViewController, UISearchResultsUpdating, U
      func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
          defer { tableView.deselectRow(at: indexPath, animated: true) }
          if let pkg = ds.itemIdentifier(for: indexPath) {
-             print("Seleccionaste paquete:", pkg.package_id)
+             print("Seleccionaste paquete:", pkg.package_id) //TODO: Flujo de compra de paquete. Agregar al carrito?
          }
      }
  }

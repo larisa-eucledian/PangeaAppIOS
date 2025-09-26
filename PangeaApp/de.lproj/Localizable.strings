@@ -54,3 +54,36 @@ settings.profile   = "Benutzerprofil";
 
 myesims.empty.title    = "Du hast noch keine eSIMs";
 myesims.empty.subtitle = "Kaufe eine eSIM, um sie hier zu sehen";
+
+auth.login.title = "Anmelden";
+auth.email.placeholder = "E-Mail";
+auth.password.placeholder = "Passwort";
+auth.login.button = "Anmelden";
+auth.register.cta = "Konto erstellen";
+app.logo = "App-Logo";
+
+auth.register.title = "Konto erstellen";
+auth.name.placeholder = "Benutzername";
+auth.password.confirm.placeholder = "Passwort bestätigen";
+auth.register.button = "Konto erstellen";
+
+auth.error.empty_email = "Bitte E-Mail eingeben.";
+auth.error.invalid_email = "E-Mail-Format ist ungültig.";
+auth.error.empty_password = "Bitte Passwort eingeben.";
+auth.error.short_password = "Das Passwort muss mindestens %d Zeichen haben.";
+auth.error.empty_name = "Bitte Benutzernamen eingeben.";
+auth.error.short_name = "Benutzername ist zu kurz.";
+auth.error.password_mismatch = "Passwörter stimmen nicht überein.";
+
+auth.error.network = "Verbindung zum Server fehlgeschlagen.";
+auth.error.unauthorized = "Sitzung abgelaufen. Bitte erneut anmelden.";
+auth.error.invalid_credentials = "E-Mail oder Passwort ist falsch.";
+auth.error.email_in_use = "Diese E-Mail ist bereits registriert.";
+auth.error.decoding = "Daten konnten nicht verarbeitet werden.";
+auth.error.no_data = "Keine Daten vom Server empfangen.";
+auth.error.server = "Interner Fehler. Bitte später erneut versuchen.";
+
+settings.logout.title = "Abmelden";
+settings.logout.message = "Möchtest du dich wirklich abmelden?";
+settings.logout.confirm = "Abmelden";
+common.cancel = "Abbrechen";

@@ -7,13 +7,28 @@
 
 import UIKit
 
-class SettingsViewController: UIViewController {
+final class SettingsViewController: UITableViewController {
+    @IBOutlet weak var logoutCell: UITableViewCell! // TODO: Conectar a la celda “Logout” en el Storyboard
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        defer { tableView.deselectRow(at: indexPath, animated: true) }
+        guard let cell = tableView.cellForRow(at: indexPath) else { return }
 
-        // Do any additional setup after loading the view.
+        if cell === logoutCell {
+            let alert = UIAlertController(
+                title: NSLocalizedString("settings.logout.title", comment: ""),
+                message: NSLocalizedString("settings.logout.message", comment: ""),
+                preferredStyle: .actionSheet
+            )
+            alert.addAction(UIAlertAction(title: NSLocalizedString("common.cancel", comment: ""), style: .cancel))
+            alert.addAction(UIAlertAction(title: NSLocalizedString("settings.logout.confirm", comment: ""), style: .destructive) { _ in
+                SessionManager.shared.clear()
+            })
+            present(alert, animated: true)
+        }
     }
+}
+
     
 
     /*
@@ -25,5 +40,3 @@ class SettingsViewController: UIViewController {
         // Pass the selected object to the new view controller.
     }
     */
-
-}

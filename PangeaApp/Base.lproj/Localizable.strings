@@ -53,3 +53,36 @@ settings.profile   = "User profile";
 
 myesims.empty.title    = "You don’t have eSIMs yet";
 myesims.empty.subtitle = "Buy an eSIM to see it here";
+
+auth.login.title = "Log in";
+auth.email.placeholder = "Email";
+auth.password.placeholder = "Password";
+auth.login.button = "Log in";
+auth.register.cta = "Create account";
+app.logo = "App logo";
+
+auth.register.title = "Create account";
+auth.name.placeholder = "Username";
+auth.password.confirm.placeholder = "Confirm password";
+auth.register.button = "Create account";
+
+auth.error.empty_email = "Enter your email.";
+auth.error.invalid_email = "Email format is not valid.";
+auth.error.empty_password = "Enter your password.";
+auth.error.short_password = "Password must be at least %d characters.";
+auth.error.empty_name = "Enter your username.";
+auth.error.short_name = "Username is too short.";
+auth.error.password_mismatch = "Passwords don’t match.";
+
+auth.error.network = "Could not connect to the server.";
+auth.error.unauthorized = "Session expired. Please log in again.";
+auth.error.invalid_credentials = "Incorrect email or password.";
+auth.error.email_in_use = "This email is already registered.";
+auth.error.decoding = "Failed to process data.";
+auth.error.no_data = "No data received from server.";
+auth.error.server = "Internal error. Try again later.";
+
+settings.logout.title = "Log out";
+settings.logout.message = "Are you sure you want to log out?";
+settings.logout.confirm = "Log out";
+common.cancel = "Cancel";
