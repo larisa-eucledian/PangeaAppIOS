@@ -11,21 +11,24 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
     private var sessionObserver: NSObjectProtocol?
 
-    func scene(
-        _ scene: UIScene,
-        willConnectTo session: UISceneSession,
-        options connectionOptions: UIScene.ConnectionOptions
-    ) {
+    func scene(_ scene: UIScene,
+               willConnectTo session: UISceneSession,
+               options connectionOptions: UIScene.ConnectionOptions) {
         guard (scene as? UIWindowScene) != nil else { return }
         configureAppearance()
         SessionManager.shared.loadFromKeychain()
         hookSessionObserverIfNeeded()
-        if !SessionManager.shared.isValid {
-            DispatchQueue.main.async { [weak self] in
-                self?.presentLogin()
+        Reachability.shared.start()
+
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            OfflineBannerPresenter.shared.start(window: self.window)
+            if !SessionManager.shared.isValid {
+                self.presentLogin()
             }
         }
     }
+
 
     private func hookSessionObserverIfNeeded() {
         guard sessionObserver == nil else { return }

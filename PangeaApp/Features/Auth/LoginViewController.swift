@@ -125,7 +125,6 @@ final class LoginViewController: UIViewController {
         createAccountButton.setTitle(NSLocalizedString("auth.register.cta", comment: "Crear cuenta"), for: .normal)
         createAccountButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
         createAccountButton.titleLabel?.adjustsFontForContentSizeCategory = true
-        createAccountButton.contentEdgeInsets = UIEdgeInsets(top: 8, left: 0, bottom: 8, right: 0)
         content.addArrangedSubview(createAccountButton)
         
         attachPasswordToggle(to: passwordField)

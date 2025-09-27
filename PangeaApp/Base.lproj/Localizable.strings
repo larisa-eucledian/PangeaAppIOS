@@ -86,3 +86,5 @@ settings.logout.title = "Log out";
 settings.logout.message = "Are you sure you want to log out?";
 settings.logout.confirm = "Log out";
 common.cancel = "Cancel";
+
+net.offline = "No internet connection.";

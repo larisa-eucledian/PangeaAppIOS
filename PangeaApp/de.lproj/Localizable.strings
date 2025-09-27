@@ -87,3 +87,5 @@ settings.logout.title = "Abmelden";
 settings.logout.message = "Möchtest du dich wirklich abmelden?";
 settings.logout.confirm = "Abmelden";
 common.cancel = "Abbrechen";
+
+net.offline = "Keine Internetverbindung.";

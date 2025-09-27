@@ -87,3 +87,5 @@ settings.logout.title = "Cerrar sesión";
 settings.logout.message = "¿Seguro que quieres cerrar sesión?";
 settings.logout.confirm = "Cerrar sesión";
 common.cancel = "Cancelar";
+
+net.offline = "Sin conexión a Internet.";
