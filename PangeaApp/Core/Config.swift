@@ -7,7 +7,7 @@
 
 import Foundation
 enum Config {
-    static let baseURL = URL(string: "https://TU_BASE_DEV")!
-    static let jwtDev = "<JWT_DEV>"              // TODO: reemplazar cuando haya login (AuthManager)
-    static let tenantKeyDev = "<TENANT_KEY_DEV>" // requerido en packages/transactions
+    static let baseURL = URL(string: "https://e950737f306e.ngrok-free.app/api")!
+    static let jwtDev = "<JWT_DEV>"              //requests con token? (AuthManager)
+    static let tenantKeyDev = "<TENANT_KEY_DEV>"
 }

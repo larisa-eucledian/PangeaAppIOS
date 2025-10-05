@@ -247,7 +247,7 @@ final class LoginViewController: UIViewController {
         clearInvalid([emailField, passwordField])
         
         if let msg = validationErrorLogin() {
-                // Marca campos problemáticos
+ 
                 var bad: [UITextField] = []
                 if msg == NSLocalizedString("auth.error.empty_email", comment: "") ||
                    msg == NSLocalizedString("auth.error.invalid_email", comment: "") { bad.append(emailField) }
@@ -268,7 +268,7 @@ final class LoginViewController: UIViewController {
                 let session = try await AppDependencies.shared.authRepository
                     .login(identifier: identifier, password: password)
                 SessionManager.shared.save(session: session)
-                // El SceneDelegate observará sessionDidChange y cerrará este modal.
+               
             } catch {
                 showError(error)
             }

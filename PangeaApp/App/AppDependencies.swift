@@ -9,10 +9,22 @@ final class AppDependencies {
         return MockPlansRepository()
     }()
 
-    lazy var authRepository: AuthRepository = {
-        // TODO: Cambiar a RealAuthRepository cuando conectemos API real
-        return MockAuthRepository(ttlSeconds: 60 * 60) 
+
+    lazy var apiClient: APIClient = {
+        DefaultAPIClient(
+            baseURL: Config.baseURL,
+            tokenProvider: { SessionManager.shared.session?.jwt }
+        )
     }()
 
+    
+    lazy var authRepository: AuthRepository = {
+         return RealAuthRepository(api: apiClient)
+        //return MockAuthRepository()
+    }()
+
+
+    
+    
     private init() {}
 }
