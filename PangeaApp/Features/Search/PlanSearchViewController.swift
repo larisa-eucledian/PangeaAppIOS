@@ -6,6 +6,8 @@
 //
 
 import UIKit
+private var didApplyInitialSnapshot = false
+
 
 final class PlanSearchViewController: UIViewController, UITableViewDelegate, UISearchBarDelegate {
     enum Mode: Int { case single = 0, multi = 1 }
@@ -114,7 +116,11 @@ final class PlanSearchViewController: UIViewController, UITableViewDelegate, UIS
                         var snap = NSDiffableDataSourceSnapshot<Section, CountryRow>()
                         snap.appendSections([.main])
                         snap.appendItems(self.rows, toSection: .main)
-                        self.ds.apply(snap, animatingDifferences: true)
+                        
+                        let shouldAnimate = (self.viewIfLoaded?.window != nil)
+                            DispatchQueue.main.async {
+                                self.ds?.apply(snap, animatingDifferences: shouldAnimate)
+                            }
                     }
                 } catch {
                     await MainActor.run {

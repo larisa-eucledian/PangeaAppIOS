@@ -14,6 +14,9 @@ enum PackageFilter {
     case all
 }
 
+private var didApplyInitialSnapshot = false
+
+
 final class PackagesViewController: UIViewController, UISearchResultsUpdating, UITableViewDelegate {
     enum Section: Hashable { case main }
 
@@ -147,11 +150,11 @@ final class PackagesViewController: UIViewController, UISearchResultsUpdating, U
 
     private func applyFilter() {
         var result = all
-
+        
         if !query.isEmpty {
             result = result.filter { $0.package.localizedCaseInsensitiveContains(query) }
         }
-
+        
         switch currentFilter {
         case .all:
             break
@@ -162,12 +165,17 @@ final class PackagesViewController: UIViewController, UISearchResultsUpdating, U
         case .unlimitedData:
             result = result.filter { $0.isUnlimited }
         }
-
+        
         filtered = result
         var snap = NSDiffableDataSourceSnapshot<Section, PackageRow>()
         snap.appendSections([.main])
         snap.appendItems(filtered, toSection: .main)
-        ds.apply(snap, animatingDifferences: true)
+        
+        let shouldAnimate = (self.viewIfLoaded?.window != nil)
+        DispatchQueue.main.async {
+            self.ds?.apply(snap, animatingDifferences: shouldAnimate)
+            
+        }
     }
 
     private func refreshChipStyles() {

@@ -64,6 +64,52 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             NotificationCenter.default.removeObserver(token)
         }
     }
+    // MARK: - Session validation policy
+    private var lastRemoteValidation: Date? = {
+        let t = UserDefaults.standard.double(forKey: "lastRemoteValidation")
+        return t > 0 ? Date(timeIntervalSince1970: t) : nil
+    }()
+
+    private let remoteCooldown: TimeInterval = 14 * 24 * 60 * 60 // 14 días
+
+    func sceneWillEnterForeground(_ scene: UIScene) {
+        validateSession()
+    }
+
+    private func validateSession() {
+        // 1) Chequeo local (sin red)
+        if SessionManager.shared.session?.isExpired == true {
+            SessionManager.shared.clear() // mostrará Login por el observer
+            return
+        }
+
+        // 2) Política remota: SOLO Wi-Fi / no costosa + cooldown cumplido
+        let reach = Reachability.shared
+        let onWifiOrUnmetered = reach.isOnline && !(reach.isExpensive || reach.isConstrained)
+
+        let now = Date()
+        let cooldownPassed = (lastRemoteValidation == nil) ||
+                             (now.timeIntervalSince(lastRemoteValidation!) >= remoteCooldown)
+        guard onWifiOrUnmetered && cooldownPassed else { return }
+
+        // 3) Guardar timestamp (persistente)
+        lastRemoteValidation = now
+        UserDefaults.standard.set(now.timeIntervalSince1970, forKey: "lastRemoteValidation")
+
+        // 4) Validación remota (opcional; segura)
+        guard let jwt = SessionManager.shared.session?.jwt, !jwt.isEmpty else { return }
+        Task {
+            do {
+                let refreshed = try await AppDependencies.shared.authRepository.me(jwt: jwt)
+                SessionManager.shared.save(session: refreshed) // si tu /me renueva exp, se guarda
+            } catch let authErr as AuthError {
+                // Solo cerrar sesión si el server devuelve 401
+                if case .unauthorized = authErr { SessionManager.shared.clear() }
+            } catch {
+                // Errores de red u otros: NO limpies la sesión; reintenta en el próximo cooldown
+            }
+        }
+    }
 
 }
 
