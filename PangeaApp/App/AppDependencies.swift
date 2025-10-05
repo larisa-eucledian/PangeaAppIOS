@@ -19,8 +19,8 @@ final class AppDependencies {
 
     
     lazy var authRepository: AuthRepository = {
-         return RealAuthRepository(api: apiClient)
-        //return MockAuthRepository()
+        // return RealAuthRepository(api: apiClient)
+        return MockAuthRepository()
     }()
 
 
