@@ -379,9 +379,10 @@ final class CheckoutViewController: UIViewController {
         }
 
         if let cov = pack.coverage, !cov.isEmpty {
+            let countryNames = cov.map { countryName(for: $0) }.joined(separator: ", ")
             coverageLabel.attributedText = detailLine(
                 title: NSLocalizedString("checkout.coverage", comment: ""),
-                value: cov.joined(separator: ", ")
+                value: countryNames
             )
         } else {
             coverageLabel.attributedText = nil
@@ -412,6 +413,12 @@ final class CheckoutViewController: UIViewController {
             scalars.append(regional)
         }
         return String(scalars.map(Character.init))
+    }
+
+    private func countryName(for countryCode: String) -> String {
+        let code = countryCode.uppercased()
+        let locale = Locale.current
+        return locale.localizedString(forRegionCode: code) ?? code
     }
 
     // MARK: - Stripe
