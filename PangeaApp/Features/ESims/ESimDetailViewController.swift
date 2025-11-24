@@ -48,6 +48,7 @@ final class ESimDetailViewController: UIViewController {
     }
     
     required init?(coder: NSCoder) {
+        self.plansRepository = AppDependencies.shared.plansRepository
         super.init(coder: coder)
     }
     
