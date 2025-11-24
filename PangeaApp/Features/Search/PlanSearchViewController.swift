@@ -9,7 +9,7 @@ import UIKit
 private var didApplyInitialSnapshot = false
 
 
-final class PlanSearchViewController: UIViewController, UITableViewDelegate, UISearchBarDelegate {
+final class PlanSearchViewController: UIViewController, UITableViewDelegate, UISearchBarDelegate, UIScrollViewDelegate {
     enum Mode: Int { case single = 0, multi = 1 }
     enum Section: Hashable { case main }
 
