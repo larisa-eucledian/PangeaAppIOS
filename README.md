@@ -28,7 +28,7 @@ Esta app se basa en la documentación oficial del proyecto PANGEA:
 ---
 
 ## 🌐 Logo y Significado
-El logo representa **Pangea**, el supercontinente que unificó todas las masas terrestres.
+El logo representa **Pangea**, el supercontinente que existió entre hace 335 y 175 millones de años, uniendo todas las masas terrestres del planeta..
 
 Simboliza:
 
@@ -45,8 +45,7 @@ Simboliza:
 ### **📱 Dispositivo**
 Compatible con iPhone que tenga soporte de eSIM nativamente:
 
-- iPhone XS / XS Max / XR  
-- iPhone 11, 12, 13, 14, 15  
+- iPhone XS, XS Max, XR o posteriores
 Referencia técnica: https://support.apple.com/en-us/118669
 
 ### **🎛 Versión mínima**
@@ -96,7 +95,19 @@ Fecha: Cualquier mes/año futuro
 - Persistencia híbrida (CoreData + cache en memoria)
 - Manejo seguro de sesión con Keychain
 
+##🚀 Funcionalidades Core
 
+###(Resumidas a partir del Elevator Pitch y Acta de Proyecto)
+
+- Catálogo de países y búsqueda
+- Filtro de paquetes por país
+- Vista de detalle del paquete
+- Checkout completo con Stripe
+- Activación on-demand
+- Vista de uso de datos en tiempo real
+- Autenticación segura
+- Persistencia local con CoreData
+- Instalación rápida en iOS (cuando aplica)
 ---
 
 ## 🧪 Flujos recomendados para testing
