@@ -181,15 +181,15 @@ final class PlanSearchViewController: UIViewController, UITableViewDelegate, UIS
     // MARK: - Video Player Setup
 
     private func setupVideoPlayer() {
-        guard let path = Bundle.main.path(forResource: "background-travel", ofType: "mp4"),
-              let videoURL = URL(string: path) else {
+        guard let path = Bundle.main.path(forResource: "background-travel", ofType: "mp4") else {
             return
         }
 
+        let videoURL = URL(fileURLWithPath: path)
         player = AVPlayer(url: videoURL)
 
         playerLayer = AVPlayerLayer(player: player)
-        playerLayer?.videoGravity = .resizeAspect
+        playerLayer?.videoGravity = .resizeAspectFill
         playerLayer?.frame = videoContainerView.bounds
         videoContainerView.layer.addSublayer(playerLayer!)
 
