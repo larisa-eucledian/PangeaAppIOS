@@ -190,7 +190,12 @@ final class PlanSearchViewController: UIViewController, UITableViewDelegate, UIS
 
         playerLayer = AVPlayerLayer(player: player)
         playerLayer?.videoGravity = .resizeAspectFill
-        playerLayer?.frame = videoContainerView.bounds
+
+        // Set frame and explicitly center
+        let bounds = videoContainerView.bounds
+        playerLayer?.frame = bounds
+        playerLayer?.position = CGPoint(x: bounds.midX, y: bounds.midY)
+
         videoContainerView.layer.addSublayer(playerLayer!)
 
         player?.isMuted = true
@@ -211,7 +216,9 @@ final class PlanSearchViewController: UIViewController, UITableViewDelegate, UIS
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        playerLayer?.frame = videoContainerView.bounds
+        let bounds = videoContainerView.bounds
+        playerLayer?.frame = bounds
+        playerLayer?.position = CGPoint(x: bounds.midX, y: bounds.midY)
     }
 
     deinit {
