@@ -182,7 +182,7 @@ final class PlanSearchViewController: UIViewController, UITableViewDelegate, UIS
 
     private func setupVideoPlayer() {
         guard let videoPath = Bundle.main.path(forResource: "background-travel", ofType: "mp4", inDirectory: "Resources/Videos") else {
-            print("⚠️ Video file not found")
+            print(" Video file not found")
             return
         }
 
@@ -193,11 +193,7 @@ final class PlanSearchViewController: UIViewController, UITableViewDelegate, UIS
         playerLayer?.videoGravity = .resizeAspectFill
         playerLayer?.frame = videoContainerView.bounds
         videoContainerView.layer.addSublayer(playerLayer!)
-
-        // Mute video
         player?.isMuted = true
-
-        // Autoplay
         player?.play()
 
         // Loop video
