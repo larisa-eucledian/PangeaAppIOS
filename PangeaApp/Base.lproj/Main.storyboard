@@ -21,12 +21,13 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2MS-w7-6Gc" userLabel="Header">
                                 <rect key="frame" x="0.0" y="162" width="393" height="309"/>
                                 <subviews>
-                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="banner" translatesAutoresizingMaskIntoConstraints="NO" id="Lcd-2f-If6">
+                                    <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Lcd-2f-If6" userLabel="VideoContainer">
                                         <rect key="frame" x="0.0" y="0.0" width="393" height="200"/>
+                                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="200" id="l3v-Cm-ejX"/>
                                         </constraints>
-                                    </imageView>
+                                    </view>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="RTm-fg-qpg">
                                         <rect key="frame" x="16" y="216" width="361" height="85"/>
                                         <subviews>
@@ -87,6 +88,7 @@
                         <outlet property="countriesTableView" destination="n3v-SR-cr4" id="Iv4-m5-t77"/>
                         <outlet property="modeSegmented" destination="fnn-bl-M00" id="CXW-xJ-EGh"/>
                         <outlet property="searchBar" destination="7Fa-bS-e7h" id="oMf-AZ-BWC"/>
+                        <outlet property="videoContainerView" destination="Lcd-2f-If6" id="vid-con-let1"/>
                         <segue destination="Kei-Zs-ybQ" kind="show" identifier="ShowPackages" id="2uZ-oi-jRY"/>
                     </connections>
                 </viewController>
