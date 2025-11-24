@@ -39,13 +39,43 @@ final class RealPlansRepository: PlansRepository {
         let response: CountriesResponseDTO = try await api.send(req)
         var countries = response.data
         
-        // 3. Client-side search filtering 
+        // 3. Client-side search filtering
         if let search = search, !search.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             let searchTerm = search.lowercased()
             countries = countries.filter { country in
-                country.country_name.lowercased().contains(searchTerm) ||
-                country.country_code.lowercased().contains(searchTerm) ||
-                (country.covered_countries?.contains { $0.lowercased().contains(searchTerm) } ?? false)
+                // Search in country name (as provided by backend)
+                if country.country_name.lowercased().contains(searchTerm) {
+                    return true
+                }
+
+                // Search in country code
+                if country.country_code.lowercased().contains(searchTerm) {
+                    return true
+                }
+
+                // Search in localized country name (e.g., "México" when device is in Spanish)
+                let localizedName = self.countryName(for: country.country_code)
+                if localizedName.lowercased().contains(searchTerm) {
+                    return true
+                }
+
+                // Search in covered countries (both codes and localized names)
+                if let coveredCountries = country.covered_countries {
+                    for countryCode in coveredCountries {
+                        // Match country code (e.g., "MX")
+                        if countryCode.lowercased().contains(searchTerm) {
+                            return true
+                        }
+
+                        // Match localized country name (e.g., "México", "Mexico")
+                        let countryName = self.countryName(for: countryCode)
+                        if countryName.lowercased().contains(searchTerm) {
+                            return true
+                        }
+                    }
+                }
+
+                return false
             }
         }
         
@@ -63,7 +93,15 @@ final class RealPlansRepository: PlansRepository {
             let response: PackagesResponseDTO = try await api.send(req)
             return response.data
         }
-    
+
+    // MARK: - Helpers
+
+    private func countryName(for countryCode: String) -> String {
+        let code = countryCode.uppercased()
+        let locale = Locale.current
+        return locale.localizedString(forRegionCode: code) ?? code
+    }
+
     // MARK: - Response DTOs
     
     private struct CountriesResponseDTO: Decodable {
