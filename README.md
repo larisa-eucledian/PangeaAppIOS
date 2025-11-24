@@ -95,9 +95,9 @@ Fecha: Cualquier mes/año futuro
 - Persistencia híbrida (CoreData + cache en memoria)
 - Manejo seguro de sesión con Keychain
 
-##🚀 Funcionalidades Core
+## 🚀 Funcionalidades Core
 
-###(Resumidas a partir del Elevator Pitch y Acta de Proyecto)
+### (Resumidas a partir del Elevator Pitch y Acta de Proyecto)
 
 - Catálogo de países y búsqueda
 - Filtro de paquetes por país
