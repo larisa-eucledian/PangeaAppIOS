@@ -17,7 +17,7 @@ enum PackageFilter {
 private var didApplyInitialSnapshot = false
 
 
-final class PackagesViewController: UIViewController, UISearchResultsUpdating, UITableViewDelegate {
+final class PackagesViewController: UIViewController, UISearchResultsUpdating, UITableViewDelegate, UIScrollViewDelegate {
     enum Section: Hashable { case main }
 
     var repository: PlansRepository?
@@ -195,4 +195,9 @@ final class PackagesViewController: UIViewController, UISearchResultsUpdating, U
                  navigationController?.pushViewController(checkoutVC, animated: true)
              }
      }
+
+    // MARK: - UIScrollViewDelegate
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        navigationItem.searchController?.searchBar.resignFirstResponder()
+    }
  }

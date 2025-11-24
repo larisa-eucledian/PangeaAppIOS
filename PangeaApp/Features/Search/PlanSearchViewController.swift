@@ -6,10 +6,13 @@
 //
 
 import UIKit
+import AVFoundation
+import AVKit
+
 private var didApplyInitialSnapshot = false
 
 
-final class PlanSearchViewController: UIViewController, UITableViewDelegate, UISearchBarDelegate {
+final class PlanSearchViewController: UIViewController, UITableViewDelegate, UISearchBarDelegate, UIScrollViewDelegate {
     enum Mode: Int { case single = 0, multi = 1 }
     enum Section: Hashable { case main }
 
@@ -20,12 +23,17 @@ final class PlanSearchViewController: UIViewController, UITableViewDelegate, UIS
     private var rows: [CountryRow] = []
 
     @IBOutlet weak var modeSegmented: UISegmentedControl!
-    
+
     @IBOutlet weak var countriesTableView: UITableView!
-   
+
     @IBOutlet weak var searchBar: UISearchBar!
-    
+
+    @IBOutlet weak var videoContainerView: UIView!
+
     private var ds: UITableViewDiffableDataSource<Section, CountryRow>!
+
+    private var player: AVPlayer?
+    private var playerLayer: AVPlayerLayer?
 
     required init?(coder: NSCoder) { super.init(coder: coder) }
 
@@ -41,9 +49,9 @@ final class PlanSearchViewController: UIViewController, UITableViewDelegate, UIS
         view.backgroundColor = .systemBackground
 
         countriesTableView.register(CountryCell.self, forCellReuseIdentifier: "CountryCell")
-            
+
         countriesTableView.delegate = self
-        
+
         searchBar.delegate = self
         searchBar.autocapitalizationType = .none
         searchBar.returnKeyType = .done
@@ -60,7 +68,7 @@ final class PlanSearchViewController: UIViewController, UITableViewDelegate, UIS
 
                modeSegmented.selectedSegmentIndex = 0
                fetchAndRender()
-        
+
             view.backgroundColor = AppColor.background
             countriesTableView.backgroundColor = .clear
             countriesTableView.separatorColor = AppColor.border
@@ -83,8 +91,10 @@ final class PlanSearchViewController: UIViewController, UITableViewDelegate, UIS
                 string: tf.placeholder ?? "",
                 attributes: [.foregroundColor: AppColor.textMuted]
             )
-            searchBar.tintColor = AppColor.primary  
+            searchBar.tintColor = AppColor.primary
 
+            // Video hero
+            setupVideoPlayer()
            }
 
     @IBAction func modeChanged(_ sender: UISegmentedControl) {
@@ -163,9 +173,58 @@ final class PlanSearchViewController: UIViewController, UITableViewDelegate, UIS
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         searchBar.resignFirstResponder()
     }
-    
+
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchBar.resignFirstResponder()
+    }
+
+    // MARK: - Video Player Setup
+
+    private func setupVideoPlayer() {
+        guard let path = Bundle.main.path(forResource: "background-travel", ofType: "mp4") else {
+            return
+        }
+
+        let videoURL = URL(fileURLWithPath: path)
+        player = AVPlayer(url: videoURL)
+
+        playerLayer = AVPlayerLayer(player: player)
+        playerLayer?.videoGravity = .resizeAspectFill
+
+        // Set frame and explicitly center
+        let bounds = videoContainerView.bounds
+        playerLayer?.frame = bounds
+        playerLayer?.position = CGPoint(x: bounds.midX, y: bounds.midY)
+
+        videoContainerView.layer.addSublayer(playerLayer!)
+
+        player?.isMuted = true
+        player?.play()
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(videoDidEnd),
+            name: .AVPlayerItemDidPlayToEndTime,
+            object: player?.currentItem
+        )
+    }
+
+    @objc private func videoDidEnd() {
+        player?.seek(to: .zero)
+        player?.play()
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        let bounds = videoContainerView.bounds
+        playerLayer?.frame = bounds
+        playerLayer?.position = CGPoint(x: bounds.midX, y: bounds.midY)
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+        player?.pause()
+        player = nil
     }
 
 }

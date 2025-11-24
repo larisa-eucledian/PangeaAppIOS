@@ -312,8 +312,13 @@ final class CheckoutViewController: UIViewController {
         subtitleLabel.text = NSLocalizedString("checkout.subtitle", comment: "")
 
         // País
-        let code = (pack.coverage?.first ?? "")
-        let flag = flagEmoji(for: code)
+        let flag: String
+        if let coverage = pack.coverage, coverage.count > 1 {
+            flag = "🌍"
+        } else {
+            let code = (pack.coverage?.first ?? "")
+            flag = flagEmoji(for: code)
+        }
         countryFlagLabel.text = flag
         countryNameLabel.text = countryName
 
