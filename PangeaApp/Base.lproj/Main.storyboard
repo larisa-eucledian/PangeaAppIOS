@@ -364,6 +364,8 @@
                     <tabBarItem key="tabBarItem" title="Settings" image="gear" catalog="system" id="xso-TU-gmF"/>
                     <connections>
                         <outlet property="logoutCell" destination="h8g-42-Y9z" id="8xj-tr-Kg3"/>
+                        <outlet property="supportCell" destination="36X-WO-z6Z" id="sup-ou-let1"/>
+                        <outlet property="videosCell" destination="Lgp-0u-X0t" id="vid-ou-let1"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="f1V-2T-HKu" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
