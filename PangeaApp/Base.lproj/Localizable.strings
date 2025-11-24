@@ -53,6 +53,38 @@ settings.profile   = "User profile";
 
 myesims.empty.title    = "You don’t have eSIMs yet";
 myesims.empty.subtitle = "Buy an eSIM to see it here";
+esim.coverage.unknown = "Unknown coverage";
+esim.expires = "Expires: %@";
+esim.not.activated = "Not activated yet";
+esim.status.ready = "Ready for Activation";
+esim.status.active = "Active";
+esim.status.expired = "Expired";
+esim.status.unknown = "Unknown";
+title.esim.detail = "eSIM Details";
+esim.detail.iccid = "ICCID";
+esim.detail.coverage = "Coverage";
+esim.detail.expiration = "Expiration Date";
+esim.detail.activation.code = "Activation Code";
+esim.detail.lpa.code = "LPA Code";
+esim.detail.not.available = "Not available";
+esim.button.activate = "Activate eSIM";
+esim.activate.confirm.title = "Activate eSIM?";
+esim.activate.confirm.message = "This will activate your eSIM. Continue?";
+esim.activate.success.title = "Success";
+esim.activate.success.message = "Your eSIM has been activated successfully!";
+esim.days.left = "%d days left";
+esim.activated.on = "Activated: %@";
+esim.expires.on = "Expires: %@";
+esim.purchased.on = "Purchased: %@";
+esim.check.usage = "Check your usage here";
+esim.activate.cta = "Your eSIM is not active yet. Activate and install it here to enjoy its benefits";
+esim.quick.install = "Quick Install";
+esim.detail.activated = "Activated";
+esim.usage.data = "Data";
+esim.usage.sms = "SMS";
+esim.usage.voice = "Voice";
+error.title = "Error";
+
 
 auth.login.title = "Log in";
 auth.email.placeholder = "Email";
@@ -60,6 +92,10 @@ auth.password.placeholder = "Password";
 auth.login.button = "Log in";
 auth.register.cta = "Create account";
 app.logo = "App logo";
+auth.login.subtitle = "Sign in to continue";
+auth.forgotPassword = "Forgot password?";
+auth.register.prompt = "Don't have an account?";
+auth.register.link = "Register";
 
 auth.register.title = "Create account";
 auth.name.placeholder = "Username";
@@ -73,6 +109,12 @@ auth.error.short_password = "Password must be at least %d characters.";
 auth.error.empty_name = "Enter your username.";
 auth.error.short_name = "Username is too short.";
 auth.error.password_mismatch = "Passwords don’t match.";
+
+auth.forgot.title = "Forgot Password";
+auth.forgot.subtitle = "Enter your email and we'll send you a reset link";
+auth.forgot.button = "Send Reset Link";
+auth.forgot.success.title = "Email Sent!";
+auth.forgot.success.message = "Check your inbox for the password reset link";
 
 auth.error.network = "Could not connect to the server.";
 auth.error.unauthorized = "Session expired. Please log in again.";
@@ -88,3 +130,31 @@ settings.logout.confirm = "Log out";
 common.cancel = "Cancel";
 
 net.offline = "No internet connection.";
+general.ok = "OK";
+general.error = "Error";
+
+title.checkout = "Checkout";
+checkout.title = "Review your plan";
+checkout.subtitle = "Confirm your eSIM details before paying.";
+
+checkout.validity.info = "Validity starts when you activate the eSIM in the app, not when you purchase it.";
+
+
+checkout.pay.button = "Pay with card";
+
+checkout.data = "Data";
+checkout.calls = "Calls";
+checkout.calls.included = "Calls included";
+checkout.sms = "SMS";
+checkout.sms.included = "SMS included";
+checkout.extras = "Extras";
+checkout.coverage = "Coverage";
+
+feature.data_roaming = "Data roaming";
+feature.usage_check = "Usage check";
+
+checkout.status.preparing = "Preparing secure payment...";
+checkout.status.ready = "Payment ready. You can pay securely.";
+checkout.status.success = "Payment completed successfully!";
+checkout.status.canceled = "Payment canceled.";
+checkout.secure.info = "Pay securely with:";

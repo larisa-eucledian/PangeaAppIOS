@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import StripePaymentSheet
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -13,8 +14,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
-        return true
+        STPAPIClient.shared.publishableKey = "pk_test_51RWP9SRJC2fhvSRIg4Hu7MExUGWlRb4019sctM0z0G07y2OiEgsGNcrfuJk4ssgCXCslLl5K2MB8LKwTLrcGDHDF00LH4mFUXB"
+            return true
     }
 
     // MARK: UISceneSession Lifecycle

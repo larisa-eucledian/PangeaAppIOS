@@ -6,7 +6,9 @@ final class AppDependencies {
     static let shared = AppDependencies()
 
     lazy var plansRepository: PlansRepository = {
-        return MockPlansRepository()
+        //return MockPlansRepository()
+        //return CachedPlansRepository(api: apiClient)
+        return RealPlansRepository(api: apiClient)
     }()
 
 
@@ -19,12 +21,18 @@ final class AppDependencies {
 
     
     lazy var authRepository: AuthRepository = {
-        // return RealAuthRepository(api: apiClient)
-        return MockAuthRepository()
+        return RealAuthRepository(api: apiClient)
+        //return MockAuthRepository()
     }()
 
-
+    lazy var esimsRepository: ESimsRepository = {
+        //return CachedESimsRepository(api: apiClient)
+        return RealESimsRepository(api: apiClient)
+    }()
     
+    lazy var transactionRepository: TransactionRepository = {
+        RealTransactionRepository(apiClient: apiClient)
+    }()
     
     private init() {}
 }

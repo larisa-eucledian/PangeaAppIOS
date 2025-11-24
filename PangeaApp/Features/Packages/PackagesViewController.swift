@@ -188,8 +188,11 @@ final class PackagesViewController: UIViewController, UISearchResultsUpdating, U
      // MARK: - UITableViewDelegate
      func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
          defer { tableView.deselectRow(at: indexPath, animated: true) }
-         if let pkg = ds.itemIdentifier(for: indexPath) {
-             print("Seleccionaste paquete:", pkg.package_id) //TODO: Flujo de compra de paquete. Agregar al carrito?
-         }
+
+             if let pkg = ds.itemIdentifier(for: indexPath) {
+                 // Flujo de compra del paquete → Checkout
+                 let checkoutVC = CheckoutViewController(package: pkg, countryName: countryName)
+                 navigationController?.pushViewController(checkoutVC, animated: true)
+             }
      }
  }

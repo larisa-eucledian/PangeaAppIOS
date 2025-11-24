@@ -4,7 +4,6 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
-        <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -68,64 +67,6 @@
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="n3v-SR-cr4">
                                 <rect key="frame" x="0.0" y="471" width="393" height="264"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="CountryCell" id="uD6-gS-w7a" customClass="CountryCell" customModule="PangeaApp" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="50" width="393" height="82.666664123535156"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="uD6-gS-w7a" id="VmZ-fN-lML">
-                                            <rect key="frame" x="0.0" y="0.0" width="362.66666666666669" height="82.666664123535156"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="751" verticalCompressionResistancePriority="751" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hdR-VZ-Wis">
-                                                    <rect key="frame" x="36" y="19.666666666666671" width="60" height="40"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="width" constant="60" id="FW1-zz-Xl3"/>
-                                                    </constraints>
-                                                </imageView>
-                                                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="lNM-Bt-gGB">
-                                                    <rect key="frame" x="111.99999999999999" y="18.999999999999996" width="198.66666666666663" height="44.666666666666657"/>
-                                                    <subviews>
-                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XCK-8d-H4K">
-                                                            <rect key="frame" x="0.0" y="0.0" width="198.66666666666666" height="24.333333333333332"/>
-                                                            <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
-                                                            <nil key="textColor"/>
-                                                            <nil key="highlightedColor"/>
-                                                        </label>
-                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="252" text="subtitle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="F2N-TY-OXm">
-                                                            <rect key="frame" x="0.0" y="24.333333333333336" width="198.66666666666666" height="20.333333333333336"/>
-                                                            <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
-                                                            <nil key="textColor"/>
-                                                            <nil key="highlightedColor"/>
-                                                        </label>
-                                                    </subviews>
-                                                    <constraints>
-                                                        <constraint firstAttribute="bottom" secondItem="F2N-TY-OXm" secondAttribute="bottom" id="0s6-5x-PpG"/>
-                                                        <constraint firstItem="XCK-8d-H4K" firstAttribute="leading" secondItem="lNM-Bt-gGB" secondAttribute="leading" id="1PQ-DD-YoY"/>
-                                                        <constraint firstItem="F2N-TY-OXm" firstAttribute="bottom" secondItem="lNM-Bt-gGB" secondAttribute="bottomMargin" id="9ax-2B-uL6"/>
-                                                        <constraint firstItem="F2N-TY-OXm" firstAttribute="leading" secondItem="lNM-Bt-gGB" secondAttribute="leading" id="Own-yv-Bdc"/>
-                                                        <constraint firstAttribute="trailing" secondItem="XCK-8d-H4K" secondAttribute="trailing" id="QLG-Bx-vMQ"/>
-                                                        <constraint firstItem="F2N-TY-OXm" firstAttribute="top" secondItem="XCK-8d-H4K" secondAttribute="bottom" constant="3.5527136788005009e-15" id="gFI-aP-q7s"/>
-                                                        <constraint firstAttribute="bottom" secondItem="F2N-TY-OXm" secondAttribute="bottom" id="haO-N5-Iy6"/>
-                                                        <constraint firstAttribute="trailing" secondItem="F2N-TY-OXm" secondAttribute="trailing" id="pCK-1c-Yj9"/>
-                                                    </constraints>
-                                                </stackView>
-                                            </subviews>
-                                            <constraints>
-                                                <constraint firstItem="hdR-VZ-Wis" firstAttribute="centerY" secondItem="VmZ-fN-lML" secondAttribute="centerY" constant="-1.6666653951009067" id="1H3-gP-RjH"/>
-                                                <constraint firstItem="hdR-VZ-Wis" firstAttribute="centerY" secondItem="lNM-Bt-gGB" secondAttribute="centerY" constant="-1.6699999999999999" id="3a7-2w-NOy"/>
-                                                <constraint firstItem="lNM-Bt-gGB" firstAttribute="top" secondItem="VmZ-fN-lML" secondAttribute="topMargin" constant="8" id="XQn-9S-S2j"/>
-                                                <constraint firstAttribute="trailingMargin" secondItem="lNM-Bt-gGB" secondAttribute="trailing" constant="44.000000000000057" id="eZZ-xZ-R8u"/>
-                                                <constraint firstItem="lNM-Bt-gGB" firstAttribute="leading" relation="lessThanOrEqual" secondItem="hdR-VZ-Wis" secondAttribute="trailing" constant="16" id="maJ-fs-Hc5"/>
-                                                <constraint firstItem="hdR-VZ-Wis" firstAttribute="leading" secondItem="VmZ-fN-lML" secondAttribute="leadingMargin" constant="16" id="pBG-QP-hXL"/>
-                                            </constraints>
-                                        </tableViewCellContentView>
-                                        <connections>
-                                            <outlet property="flagImageView" destination="hdR-VZ-Wis" id="6wB-ph-sMq"/>
-                                            <outlet property="subtitleLabel" destination="F2N-TY-OXm" id="bNO-pv-1M2"/>
-                                            <outlet property="titleLabel" destination="XCK-8d-H4K" id="LzL-0b-hnU"/>
-                                        </connections>
-                                    </tableViewCell>
-                                </prototypes>
                                 <sections/>
                             </tableView>
                         </subviews>
@@ -284,43 +225,21 @@
             </objects>
             <point key="canvasLocation" x="2513.740458015267" y="-35.211267605633807"/>
         </scene>
-        <!--Mis eSIMs-->
+        <!--Sims View Controller-->
         <scene sceneID="MqI-Rh-LWh">
             <objects>
-                <viewController id="hYC-77-7FP" sceneMemberID="viewController">
+                <viewController id="hYC-77-7FP" customClass="ESimsViewController" customModule="PangeaApp" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="yTv-rb-OeU">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="gL4-hE-Ml5">
-                                <rect key="frame" x="135" y="400.66666666666669" width="123.33333333333331" height="50.666666666666686"/>
-                                <subviews>
-                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="jW9-tS-wPS">
-                                        <rect key="frame" x="0.0" y="-2.6666666666666679" width="123.33333333333333" height="25.666666666666668"/>
-                                        <color key="tintColor" name="App.Primary"/>
-                                        <imageReference key="image" image="exclamationmark.circle" catalog="system" symbolScale="large"/>
-                                    </imageView>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No tienes eSIMs" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dSS-Qz-nkr">
-                                        <rect key="frame" x="0.0" y="30.333333333333314" width="123.33333333333333" height="20.333333333333329"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                        <color key="textColor" name="App.Text.Muted"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                </subviews>
-                            </stackView>
-                        </subviews>
                         <viewLayoutGuide key="safeArea" id="7xc-dT-mAh"/>
                         <color key="backgroundColor" name="App.Background"/>
-                        <constraints>
-                            <constraint firstItem="gL4-hE-Ml5" firstAttribute="centerY" secondItem="yTv-rb-OeU" secondAttribute="centerY" id="iel-W4-ebW"/>
-                            <constraint firstItem="gL4-hE-Ml5" firstAttribute="centerX" secondItem="yTv-rb-OeU" secondAttribute="centerX" id="j54-M0-ogu"/>
-                        </constraints>
                     </view>
-                    <tabBarItem key="tabBarItem" title="Mis eSIMs" image="esim" catalog="system" id="Cg8-bx-9cL"/>
+                    <navigationItem key="navigationItem" id="UrZ-ou-hpS"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="FdT-Sd-ZWO" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-349" y="-815"/>
+            <point key="canvasLocation" x="576.33587786259545" y="-815.49295774647896"/>
         </scene>
         <!--Login View Controller-->
         <scene sceneID="wWa-Lj-bND">
@@ -348,7 +267,7 @@
                     </tabBar>
                     <connections>
                         <segue destination="FHc-sw-rCb" kind="relationship" relationship="viewControllers" id="ZbF-iv-30p"/>
-                        <segue destination="hYC-77-7FP" kind="relationship" relationship="viewControllers" id="h7J-Al-IcD"/>
+                        <segue destination="6mh-Fz-7mW" kind="relationship" relationship="viewControllers" id="h7J-Al-IcD"/>
                         <segue destination="Jef-w3-aEz" kind="relationship" relationship="viewControllers" id="UaT-xb-qjW"/>
                     </connections>
                 </tabBarController>
@@ -537,12 +456,30 @@
             </objects>
             <point key="canvasLocation" x="771.75572519083971" y="-35.211267605633807"/>
         </scene>
+        <!--Mis eSIMs-->
+        <scene sceneID="vBu-er-Vsd">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="6mh-Fz-7mW" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Mis eSIMs" image="esim" catalog="system" id="Cg8-bx-9cL"/>
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="nxu-nr-HHF">
+                        <rect key="frame" x="0.0" y="118" width="393" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="hYC-77-7FP" kind="relationship" relationship="rootViewController" id="vAu-mY-YeJ"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="RvB-8f-POI" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-350.38167938931298" y="-815.49295774647896"/>
+        </scene>
     </scenes>
     <resources>
         <image name="banner" width="1080" height="1080"/>
         <image name="ellipsis.message.fill" catalog="system" width="128" height="114"/>
         <image name="esim" catalog="system" width="128" height="112"/>
-        <image name="exclamationmark.circle" catalog="system" width="128" height="123"/>
         <image name="gear" catalog="system" width="128" height="122"/>
         <image name="map" catalog="system" width="128" height="112"/>
         <image name="person.fill" catalog="system" width="128" height="120"/>
@@ -566,9 +503,6 @@
         </namedColor>
         <namedColor name="App.Status.Error">
             <color red="0.95686274509803926" green="0.2627450980392157" blue="0.21176470588235294" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
-        <namedColor name="App.Text.Muted">
-            <color red="0.45882352941176469" green="0.45882352941176469" blue="0.45882352941176469" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="App.Text.Primary">
             <color red="0.12941176470588237" green="0.12941176470588237" blue="0.12941176470588237" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

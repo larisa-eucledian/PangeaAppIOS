@@ -40,10 +40,13 @@ final class PlanSearchViewController: UIViewController, UITableViewDelegate, UIS
         title = NSLocalizedString("title.countries", comment: "")
         view.backgroundColor = .systemBackground
 
+        countriesTableView.register(CountryCell.self, forCellReuseIdentifier: "CountryCell")
+            
         countriesTableView.delegate = self
         
         searchBar.delegate = self
         searchBar.autocapitalizationType = .none
+        searchBar.returnKeyType = .done
         navigationItem.searchController = nil
 
         ds = UITableViewDiffableDataSource<Section, CountryRow>(tableView: countriesTableView) { tv, ip, item in
@@ -69,7 +72,7 @@ final class PlanSearchViewController: UIViewController, UITableViewDelegate, UIS
                 .foregroundColor: AppColor.textPrimary
             ], for: .normal)
             modeSegmented.setTitleTextAttributes([
-                .foregroundColor: AppColor.background
+                .foregroundColor: AppColor.textPrimary
             ], for: .selected)
 
             // UISearchBar
@@ -153,6 +156,16 @@ final class PlanSearchViewController: UIViewController, UITableViewDelegate, UIS
             guard let name = selectedCountryName else { return }
             dest.countryName = name
         }
+    }
+    
+    // MARK: - UIScrollViewDelegate
+
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        searchBar.resignFirstResponder()
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
     }
 
 }

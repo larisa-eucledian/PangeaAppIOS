@@ -19,7 +19,7 @@ extension UIButton {
         cfg.contentInsets = NSDirectionalEdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12)
         cfg.cornerStyle = .capsule
         cfg.background.backgroundColor = selected ? AppColor.primary : AppColor.backgroundSecondary
-        cfg.baseForegroundColor = selected ? AppColor.background : AppColor.textPrimary
+        cfg.baseForegroundColor = selected ? AppColor.textPrimary : AppColor.textPrimary
         cfg.background.strokeWidth = 1
         cfg.background.strokeColor = AppColor.border
 

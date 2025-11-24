@@ -31,7 +31,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             guard let self = self else { return }
             OfflineBannerPresenter.shared.start(window: self.window)
 
-            // Gating por sesión: si no hay sesión válida, muestra Login
+            // Si no hay sesión válida, muestra Login
             if !SessionManager.shared.isValid {
                 self.presentLogin()
             }
@@ -60,10 +60,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     // MARK: - Present Login
     private func presentLogin() {
-        // Cierra teclado si estuviera visible para evitar warnings de snapshot
         window?.endEditing(true)
 
-        let vc = LoginViewController() // programático
+        let vc = LoginViewController()
         vc.modalPresentationStyle = .fullScreen
 
         guard let host = window?.rootViewController,
@@ -75,7 +74,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneDidDisconnect(_ scene: UIScene) {}
 
     func sceneDidBecomeActive(_ scene: UIScene) {
-        // Idempotente: asegura que el banner esté montado si la window cambió
+        //>Banner esté montado si la window cambió
         OfflineBannerPresenter.shared.start(window: self.window)
     }
 
