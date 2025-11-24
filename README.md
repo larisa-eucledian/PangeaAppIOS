@@ -84,7 +84,7 @@ Fecha: Cualquier mes/año futuro
 | **Stripe iOS SDK** | PaymentSheet, Payment Intents |
 | **UIKit (Storyboard)** | Interfaz nativa |
 | **DiffableDataSource** | Manejo eficiente de listas |
-| **VFoundation y AVKit** | Carga video en Hero |
+| **AVFoundation y AVKit** | Carga video en Hero |
 
 ---
 
