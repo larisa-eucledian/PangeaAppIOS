@@ -87,12 +87,24 @@ final class RealPlansRepository: PlansRepository {
             let req = APIRequest(
                 method: .GET,
                 path: Path.packages,
-                query: ["country": countryName]  
+                query: ["country": countryName]
             )
-            
+
             let response: PackagesResponseDTO = try await api.send(req)
             return response.data
         }
+
+    func fetchPackage(packageId: String) async throws -> PackageRow? {
+        // Try fetching with package_id filter
+        let req = APIRequest(
+            method: .GET,
+            path: Path.packages,
+            query: ["package_id": packageId]
+        )
+
+        let response: PackagesResponseDTO = try await api.send(req)
+        return response.data.first
+    }
 
     // MARK: - Helpers
 
