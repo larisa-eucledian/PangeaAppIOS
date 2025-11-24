@@ -110,4 +110,6 @@ Fecha: Cualquier mes/año futuro
 7. Obtener el método de instalación  
 8. Ver el uso de datos en tiempo real  
 
+¡OJO LAS ESIMS GENERADAS SON DE PRUEBAS, NO SE PUEDEN INSTALAR NI TIENEN SERVICIO!
+
 ---
