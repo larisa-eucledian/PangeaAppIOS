@@ -292,8 +292,9 @@ final class ESimDetailViewController: UIViewController {
                        value: formatter.string(from: expirationDate))
         }
         
+        let countryNames = esim.coverage.map { countryName(for: $0) }.joined(separator: ", ")
         addInfoRow(title: NSLocalizedString("esim.detail.coverage", comment: ""),
-                   value: esim.coverage.joined(separator: ", "))
+                   value: countryNames)
         
         // Activate button
         activateButton.isHidden = esim.status != .readyForActivation
@@ -476,5 +477,11 @@ final class ESimDetailViewController: UIViewController {
             scalars.append(regional)
         }
         return String(scalars.map(Character.init))
+    }
+
+    private func countryName(for countryCode: String) -> String {
+        let code = countryCode.uppercased()
+        let locale = Locale.current
+        return locale.localizedString(forRegionCode: code) ?? code
     }
 }
