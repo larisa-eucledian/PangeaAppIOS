@@ -483,9 +483,11 @@ final class CheckoutViewController: UIViewController {
 
             switch result {
                 case .completed:
-                    // Success - go to eSIMs tab
+                    // Success - notify eSIMs list and go to tab
+                    NotificationCenter.default.post(name: .eSimPurchaseCompleted, object: nil)
+
                     self.navigationController?.popToRootViewController(animated: true)
-                    
+
                     // Switch to eSIMs tab
                     if let tabBar = self.tabBarController {
                         tabBar.selectedIndex = 1
@@ -500,4 +502,9 @@ final class CheckoutViewController: UIViewController {
                 }
         }
     }
+}
+
+// MARK: - Notification Names
+extension Notification.Name {
+    static let eSimPurchaseCompleted = Notification.Name("eSimPurchaseCompleted")
 }

@@ -32,18 +32,30 @@ final class ESimsViewController: UIViewController, UITableViewDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         if repository == nil {
             repository = AppDependencies.shared.esimsRepository
         }
-        
+
         title = NSLocalizedString("title.myesims", comment: "")
         view.backgroundColor = AppColor.background
-        
+
         setupTableView()
         setupDataSource()
         setupEmptyState()
         load()
+
+        // Listen for purchase notifications
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handlePurchaseCompleted),
+            name: .eSimPurchaseCompleted,
+            object: nil
+        )
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -126,6 +138,14 @@ final class ESimsViewController: UIViewController, UITableViewDelegate {
     
     @objc private func refreshTriggered() {
         load()
+    }
+
+    @objc private func handlePurchaseCompleted() {
+        // Wait a moment for backend to process, then reload
+        print("🔔 Purchase completed notification received, will refresh eSIMs list")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            self?.load()
+        }
     }
     
     private func load(retryCount: Int = 0) {
