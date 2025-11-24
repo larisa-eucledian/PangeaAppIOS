@@ -61,7 +61,10 @@ final class ESimsViewController: UIViewController, UITableViewDelegate {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        load()
+        // Skip immediate load if expecting new eSIM (notification will trigger load)
+        if !expectingNewESim {
+            load()
+        }
     }
     
     private func setupTableView() {
@@ -142,10 +145,11 @@ final class ESimsViewController: UIViewController, UITableViewDelegate {
     }
 
     @objc private func handlePurchaseCompleted() {
-        // Wait a moment for backend to process, then reload with retries
+        // Wait for backend to process, then reload with retries
         print("🔔 Purchase completed notification received, will refresh eSIMs list")
         expectingNewESim = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+        // Give backend more time to process before first retry
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in
             self?.load()
         }
     }
@@ -180,10 +184,15 @@ final class ESimsViewController: UIViewController, UITableViewDelegate {
                 }
 
                 await MainActor.run {
-                    // Clear the flag once we have the new eSIM
+                    // Clear the flag only if count increased (new eSIM appeared)
                     if self.expectingNewESim {
-                        print("✅ New eSIM appeared after \(retryCount) retries")
-                        self.expectingNewESim = false
+                        let initialCount = previousCount ?? self.esims.count
+                        if rows.count > initialCount {
+                            print("✅ New eSIM appeared after \(retryCount) retries")
+                            self.expectingNewESim = false
+                        } else {
+                            print("⚠️ Still waiting for new eSIM (keeping expectingNewESim flag)")
+                        }
                     }
 
                     self.esims = rows.sorted { esim1, esim2 in
