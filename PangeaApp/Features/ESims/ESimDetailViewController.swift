@@ -245,6 +245,9 @@ final class ESimDetailViewController: UIViewController {
     }
     
     private func configure() {
+        // Clear previous info rows to avoid duplication
+        infoStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
+
         // Flag
         if esim.coverage.count == 1 {
             flagLabel.text = flagEmoji(for: esim.coverage[0])
