@@ -181,55 +181,21 @@ final class PlanSearchViewController: UIViewController, UITableViewDelegate, UIS
     // MARK: - Video Player Setup
 
     private func setupVideoPlayer() {
-        // Try different paths to find the video
-        var videoURL: URL?
-
-        // Option 1: Direct path with inDirectory
-        if let path = Bundle.main.path(forResource: "background-travel", ofType: "mp4", inDirectory: "Resources/Videos") {
-            videoURL = URL(fileURLWithPath: path)
-            print("✅ Video found with inDirectory: \(path)")
-        }
-        // Option 2: Without inDirectory (if file is in root of bundle)
-        else if let path = Bundle.main.path(forResource: "background-travel", ofType: "mp4") {
-            videoURL = URL(fileURLWithPath: path)
-            print("✅ Video found without inDirectory: \(path)")
-        }
-        // Option 3: Using Bundle.main.url
-        else if let url = Bundle.main.url(forResource: "background-travel", withExtension: "mp4") {
-            videoURL = url
-            print("✅ Video found with Bundle.main.url: \(url.path)")
-        }
-        // Option 4: Search in subdirectory using url
-        else if let url = Bundle.main.url(forResource: "background-travel", withExtension: "mp4", subdirectory: "Resources/Videos") {
-            videoURL = url
-            print("✅ Video found with subdirectory: \(url.path)")
-        }
-
-        guard let videoURL = videoURL else {
-            print("⚠️ Video file not found. Tried all paths.")
-            // Debug: List all bundle resources
-            if let resourcePath = Bundle.main.resourcePath {
-                print("📁 Bundle resource path: \(resourcePath)")
-                do {
-                    let contents = try FileManager.default.contentsOfDirectory(atPath: resourcePath)
-                    print("📁 Bundle contents: \(contents.prefix(10))")
-                } catch {
-                    print("❌ Could not list bundle contents: \(error)")
-                }
-            }
+        guard let path = Bundle.main.path(forResource: "background-travel", ofType: "mp4"),
+              let videoURL = URL(string: path) else {
             return
         }
 
         player = AVPlayer(url: videoURL)
 
         playerLayer = AVPlayerLayer(player: player)
-        playerLayer?.videoGravity = .resizeAspectFill
+        playerLayer?.videoGravity = .resizeAspect
         playerLayer?.frame = videoContainerView.bounds
         videoContainerView.layer.addSublayer(playerLayer!)
+
         player?.isMuted = true
         player?.play()
 
-        // Loop video
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(videoDidEnd),
