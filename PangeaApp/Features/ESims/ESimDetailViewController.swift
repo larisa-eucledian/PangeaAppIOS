@@ -14,8 +14,9 @@ final class ESimDetailViewController: UIViewController {
     
     private let scrollView = UIScrollView()
     private let contentStack = UIStackView()
-    
+
     // Header
+    private let flagLabel = UILabel()
     private let packageNameLabel = UILabel()
     private let statusBadge = UIView()
     private let statusLabel = UILabel()
@@ -99,8 +100,7 @@ final class ESimDetailViewController: UIViewController {
     
     private func setupHeader() {
         let header = UIView()
-        
-        let flagLabel = UILabel()
+
         flagLabel.font = .systemFont(ofSize: 28)
         flagLabel.translatesAutoresizingMaskIntoConstraints = false
         
@@ -245,8 +245,15 @@ final class ESimDetailViewController: UIViewController {
     }
     
     private func configure() {
+        // Flag
+        if esim.coverage.count == 1 {
+            flagLabel.text = flagEmoji(for: esim.coverage[0])
+        } else {
+            flagLabel.text = "🌍"
+        }
+
         packageNameLabel.text = esim.packageName
-        
+
         let (bgColor, textColor) = colorsForStatus(esim.status)
         statusBadge.backgroundColor = bgColor
         statusLabel.text = esim.status.displayName
