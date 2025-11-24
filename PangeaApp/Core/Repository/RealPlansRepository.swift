@@ -43,13 +43,19 @@ final class RealPlansRepository: PlansRepository {
         if let search = search, !search.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             let searchTerm = search.lowercased()
             countries = countries.filter { country in
-                // Search in country name
+                // Search in country name (as provided by backend)
                 if country.country_name.lowercased().contains(searchTerm) {
                     return true
                 }
 
                 // Search in country code
                 if country.country_code.lowercased().contains(searchTerm) {
+                    return true
+                }
+
+                // Search in localized country name (e.g., "México" when device is in Spanish)
+                let localizedName = self.countryName(for: country.country_code)
+                if localizedName.lowercased().contains(searchTerm) {
                     return true
                 }
 
