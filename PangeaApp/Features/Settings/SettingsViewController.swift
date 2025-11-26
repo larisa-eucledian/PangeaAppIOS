@@ -12,6 +12,46 @@ final class SettingsViewController: UITableViewController {
     @IBOutlet weak var supportCell: UITableViewCell!
     @IBOutlet weak var logoutCell: UITableViewCell!
 
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupUserHeader()
+    }
+
+    private func setupUserHeader() {
+        guard let userEmail = SessionManager.shared.session?.user.email, !userEmail.isEmpty else {
+            return
+        }
+
+        let headerView = UIView()
+        headerView.backgroundColor = AppColor.card
+
+        let emailLabel = UILabel()
+        emailLabel.text = userEmail
+        emailLabel.font = .systemFont(ofSize: 16, weight: .medium)
+        emailLabel.textColor = AppColor.textPrimary
+        emailLabel.textAlignment = .center
+        emailLabel.numberOfLines = 0
+        emailLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        headerView.addSubview(emailLabel)
+
+        NSLayoutConstraint.activate([
+            emailLabel.topAnchor.constraint(equalTo: headerView.topAnchor, constant: 16),
+            emailLabel.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: 16),
+            emailLabel.trailingAnchor.constraint(equalTo: headerView.trailingAnchor, constant: -16),
+            emailLabel.bottomAnchor.constraint(equalTo: headerView.bottomAnchor, constant: -16)
+        ])
+
+        tableView.tableHeaderView = headerView
+
+        // Force layout to calculate proper size
+        headerView.setNeedsLayout()
+        headerView.layoutIfNeeded()
+        let size = headerView.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
+        headerView.frame = CGRect(origin: .zero, size: size)
+        tableView.tableHeaderView = headerView
+    }
+
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         defer { tableView.deselectRow(at: indexPath, animated: true) }
         guard let cell = tableView.cellForRow(at: indexPath) else { return }
