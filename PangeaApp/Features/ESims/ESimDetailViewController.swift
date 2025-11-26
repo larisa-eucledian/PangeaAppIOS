@@ -337,16 +337,24 @@ final class ESimDetailViewController: UIViewController {
     }
     
     private func fetchPackageInfo() {
+        print("🔍 Fetching package info for packageId: \(esim.packageId)")
         Task {
             do {
                 if let package = try await plansRepository.fetchPackage(packageId: esim.packageId) {
+                    print("✅ Package fetched: \(package.package)")
+                    print("   Data: \(package.dataAmount) \(package.dataUnit)")
+                    print("   withCall: \(package.withCall ?? false)")
+                    print("   withSMS: \(package.withSMS ?? false)")
+                    print("   withHotspot: \(package.withHotspot ?? false)")
                     await MainActor.run {
                         self.packageInfo = package
                         self.addPackageFeatures(package)
                     }
+                } else {
+                    print("⚠️ Package not found for packageId: \(esim.packageId)")
                 }
             } catch {
-                print("Failed to fetch package info: \(error)")
+                print("❌ Failed to fetch package info: \(error)")
             }
         }
     }
