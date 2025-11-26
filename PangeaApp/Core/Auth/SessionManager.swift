@@ -34,17 +34,22 @@ final class SessionManager {
 
             if !jwt.isEmpty {
                 // Load user data from keychain
+                print("🔐 SessionManager: Loading user data from keychain")
                 if let userData = try? KeychainService.read(account: userKey),
                    let user = try? JSONDecoder().decode(AuthUser.self, from: userData) {
+                    print("✅ SessionManager: User data loaded - email: \(user.email), username: \(user.username)")
                     self.session = AuthSession(jwt: jwt, user: user, expiresAt: exp)
                 } else {
+                    print("⚠️ SessionManager: No user data found in keychain, using placeholder")
                     // Fallback: create placeholder user if user data not found
                     self.session = AuthSession(jwt: jwt, user: AuthUser(id: -1, username: "", email: "", confirmed: nil, blocked: nil), expiresAt: exp)
                 }
             } else {
+                print("⚠️ SessionManager: No JWT found")
                 self.session = nil
             }
         } catch {
+            print("❌ SessionManager: Error loading from keychain - \(error)")
             self.session = nil
         }
         NotificationCenter.default.post(name: Self.sessionDidChange, object: nil)
@@ -55,8 +60,12 @@ final class SessionManager {
             try KeychainService.save(Data(session.jwt.utf8), account: jwtKey)
 
             // Save user data
+            print("🔐 SessionManager: Saving user data - email: \(session.user.email), username: \(session.user.username)")
             if let userData = try? JSONEncoder().encode(session.user) {
                 try KeychainService.save(userData, account: userKey)
+                print("✅ SessionManager: User data saved successfully")
+            } else {
+                print("❌ SessionManager: Failed to encode user data")
             }
 
             if let exp = session.expiresAt {
@@ -67,6 +76,7 @@ final class SessionManager {
             self.session = session
             NotificationCenter.default.post(name: Self.sessionDidChange, object: nil)
         } catch {
+            print("❌ SessionManager: Error saving session - \(error)")
             clear()
         }
     }
