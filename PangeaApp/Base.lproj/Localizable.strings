@@ -80,6 +80,7 @@ esim.check.usage = "Check your usage here";
 esim.activate.cta = "Your eSIM is not active yet. Activate and install it here to enjoy its benefits";
 esim.quick.install = "Quick Install";
 esim.detail.activated = "Activated";
+esim.detail.purchased = "Purchased";
 esim.usage.data = "Data";
 esim.usage.sms = "SMS";
 esim.usage.voice = "Voice";
@@ -158,3 +159,11 @@ checkout.status.ready = "Payment ready. You can pay securely.";
 checkout.status.success = "Payment completed successfully!";
 checkout.status.canceled = "Payment canceled.";
 checkout.secure.info = "Pay securely with:";
+
+// Package info in eSIM detail
+package.data = "Data";
+package.calls = "Calls";
+package.sms = "SMS";
+package.hotspot = "Hotspot";
+package.included = "Included";
+package.available = "Available";

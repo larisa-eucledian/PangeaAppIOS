@@ -11,9 +11,10 @@ final class ESimsViewController: UIViewController, UITableViewDelegate {
     enum Section: Hashable { case main }
     
     var repository: ESimsRepository?
-    
+
     private var esims: [ESimRow] = []
     private var ds: UITableViewDiffableDataSource<Section, ESimRow>!
+    private var expectingNewESim = false
     
     private let tableView = UITableView()
     private let refreshControl = UIRefreshControl()
@@ -32,23 +33,38 @@ final class ESimsViewController: UIViewController, UITableViewDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         if repository == nil {
             repository = AppDependencies.shared.esimsRepository
         }
-        
+
         title = NSLocalizedString("title.myesims", comment: "")
         view.backgroundColor = AppColor.background
-        
+
         setupTableView()
         setupDataSource()
         setupEmptyState()
         load()
+
+        // Listen for purchase notifications
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handlePurchaseCompleted),
+            name: .eSimPurchaseCompleted,
+            object: nil
+        )
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        load()
+        // Skip immediate load if expecting new eSIM (notification will trigger load)
+        if !expectingNewESim {
+            load()
+        }
     }
     
     private func setupTableView() {
@@ -127,22 +143,58 @@ final class ESimsViewController: UIViewController, UITableViewDelegate {
     @objc private func refreshTriggered() {
         load()
     }
+
+    @objc private func handlePurchaseCompleted() {
+        // Wait for backend to process, then reload with retries
+        print("🔔 Purchase completed notification received, will refresh eSIMs list")
+        expectingNewESim = true
+        // Give backend more time to process before first retry
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in
+            self?.load()
+        }
+    }
     
-    private func load(retryCount: Int = 0) {
+    private func load(retryCount: Int = 0, previousCount: Int? = nil) {
         Task {
             do {
                 guard let repository else { return }
                 let rows = try await repository.fetchESims()
-                
-                // Si está vacío Y es el primer load después de compra, retry
-                if rows.isEmpty && retryCount < 3 {
-                    print("⏳ eSIMs list empty, retrying... (\(retryCount + 1)/3)")
+
+                // Check if we need to retry
+                let shouldRetry: Bool
+                if expectingNewESim && retryCount < 5 {
+                    // After purchase: retry if count hasn't increased
+                    let initialCount = previousCount ?? esims.count
+                    shouldRetry = rows.count <= initialCount
+                    if shouldRetry {
+                        print("⏳ Waiting for new eSIM to appear... (\(retryCount + 1)/5)")
+                    }
+                } else {
+                    // Normal load: only retry if empty
+                    shouldRetry = rows.isEmpty && retryCount < 3
+                    if shouldRetry {
+                        print("⏳ eSIMs list empty, retrying... (\(retryCount + 1)/3)")
+                    }
+                }
+
+                if shouldRetry {
                     try await Task.sleep(nanoseconds: 2_000_000_000) // 2 seconds
-                    self.load(retryCount: retryCount + 1)
+                    self.load(retryCount: retryCount + 1, previousCount: previousCount ?? esims.count)
                     return
                 }
-                
+
                 await MainActor.run {
+                    // Clear the flag only if count increased (new eSIM appeared)
+                    if self.expectingNewESim {
+                        let initialCount = previousCount ?? self.esims.count
+                        if rows.count > initialCount {
+                            print("✅ New eSIM appeared after \(retryCount) retries")
+                            self.expectingNewESim = false
+                        } else {
+                            print("⚠️ Still waiting for new eSIM (keeping expectingNewESim flag)")
+                        }
+                    }
+
                     self.esims = rows.sorted { esim1, esim2 in
                         if esim1.status == esim2.status {
                             return (esim1.createdAt ?? Date.distantPast) > (esim2.createdAt ?? Date.distantPast)

@@ -150,9 +150,32 @@ final class PackagesViewController: UIViewController, UISearchResultsUpdating, U
 
     private func applyFilter() {
         var result = all
-        
+
         if !query.isEmpty {
-            result = result.filter { $0.package.localizedCaseInsensitiveContains(query) }
+            result = result.filter { pkg in
+                // Search in package name
+                if pkg.package.localizedCaseInsensitiveContains(query) {
+                    return true
+                }
+
+                // Search in coverage (country codes and country names)
+                if let coverage = pkg.coverage {
+                    for countryCode in coverage {
+                        // Match country code (e.g., "MX")
+                        if countryCode.localizedCaseInsensitiveContains(query) {
+                            return true
+                        }
+
+                        // Match country name (e.g., "México", "Mexico")
+                        let countryName = self.countryName(for: countryCode)
+                        if countryName.localizedCaseInsensitiveContains(query) {
+                            return true
+                        }
+                    }
+                }
+
+                return false
+            }
         }
         
         switch currentFilter {
@@ -199,5 +222,12 @@ final class PackagesViewController: UIViewController, UISearchResultsUpdating, U
     // MARK: - UIScrollViewDelegate
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         navigationItem.searchController?.searchBar.resignFirstResponder()
+    }
+
+    // MARK: - Helpers
+    private func countryName(for countryCode: String) -> String {
+        let code = countryCode.uppercased()
+        let locale = Locale.current
+        return locale.localizedString(forRegionCode: code) ?? code
     }
  }

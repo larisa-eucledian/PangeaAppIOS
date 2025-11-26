@@ -82,6 +82,7 @@ esim.check.usage = "Nutzung hier prüfen";
 esim.activate.cta = "Deine eSIM ist noch nicht aktiv. Aktiviere und installiere sie hier, um sie zu nutzen.";
 esim.quick.install = "Schnellinstallation";
 esim.detail.activated = "Aktiviert";
+esim.detail.purchased = "Gekauft";
 esim.usage.data = "Daten";
 esim.usage.sms = "SMS";
 esim.usage.voice = "Sprache";
@@ -161,3 +162,11 @@ checkout.status.success = "Zahlung erfolgreich abgeschlossen!";
 checkout.status.canceled = "Zahlung abgebrochen.";
 checkout.validity.info = "Die Gültigkeit beginnt, wenn du die eSIM in der App aktivierst – nicht beim Kauf.";
 checkout.secure.info = "Sicher bezahlen mit:";
+
+// Package info in eSIM detail
+package.data = "Daten";
+package.calls = "Anrufe";
+package.sms = "SMS";
+package.hotspot = "Hotspot";
+package.included = "Enthalten";
+package.available = "Verfügbar";

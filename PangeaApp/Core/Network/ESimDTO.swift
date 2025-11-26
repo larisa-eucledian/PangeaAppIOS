@@ -49,15 +49,29 @@ struct ESimDTO: Decodable {
     // Convert DTO to domain model
     func toDomain() -> ESimRow {
         let dateFormatter = ISO8601DateFormatter()
-        
+        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+
+        print("🔄 ESimDTO.toDomain() for: \(package_name)")
+        print("   activation_date string: \(activation_date ?? "nil")")
+        print("   expiration_date string: \(expiration_date ?? "nil")")
+        print("   createdAt string: \(createdAt ?? "nil")")
+
+        let activationDateParsed = activation_date.flatMap { dateFormatter.date(from: $0) }
+        let expirationDateParsed = expiration_date.flatMap { dateFormatter.date(from: $0) }
+        let createdAtParsed = createdAt.flatMap { dateFormatter.date(from: $0) }
+
+        print("   ✅ activationDate parsed: \(activationDateParsed?.description ?? "nil")")
+        print("   ✅ expirationDate parsed: \(expirationDateParsed?.description ?? "nil")")
+        print("   ✅ createdAt parsed: \(createdAtParsed?.description ?? "nil")")
+
         return ESimRow(
             id: id,
             documentId: documentId,
             esimId: esim_id,
             iccid: iccid,
             status: ESimStatus(rawValue: esim_status) ?? .unknown,
-            activationDate: activation_date.flatMap { dateFormatter.date(from: $0) },
-            expirationDate: expiration_date.flatMap { dateFormatter.date(from: $0) },
+            activationDate: activationDateParsed,
+            expirationDate: expirationDateParsed,
             packageName: package_name,
             packageId: package_id,
             number: number,
@@ -69,7 +83,7 @@ struct ESimDTO: Decodable {
             smdpAddress: smdp_address,
             activationCode: activation_code,
             iosQuickInstall: ios_quick_install,
-            createdAt: createdAt.flatMap { dateFormatter.date(from: $0) },
+            createdAt: createdAtParsed,
             updatedAt: updatedAt.flatMap { dateFormatter.date(from: $0) },
             publishedAt: publishedAt.flatMap { dateFormatter.date(from: $0) }
         )

@@ -8,9 +8,12 @@
 import UIKit
 
 final class ESimDetailViewController: UIViewController {
-    
+
     var repository: ESimsRepository?
     var esim: ESimRow!
+
+    private var packageInfo: PackageRow?
+    private let plansRepository: PlansRepository
     
     private let scrollView = UIScrollView()
     private let contentStack = UIStackView()
@@ -37,13 +40,15 @@ final class ESimDetailViewController: UIViewController {
     // Activate button
     private let activateButton = UIButton(type: .system)
     
-    init(esim: ESimRow, repository: ESimsRepository? = nil) {
+    init(esim: ESimRow, repository: ESimsRepository? = nil, plansRepository: PlansRepository? = nil) {
         self.esim = esim
         self.repository = repository
+        self.plansRepository = plansRepository ?? AppDependencies.shared.plansRepository
         super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder: NSCoder) {
+        self.plansRepository = AppDependencies.shared.plansRepository
         super.init(coder: coder)
     }
     
@@ -61,7 +66,10 @@ final class ESimDetailViewController: UIViewController {
         
         setupUI()
         configure()
-        
+
+        // Fetch package info to show features
+        fetchPackageInfo()
+
         // Fetch usage if active
         if esim.status == .installed {
             fetchUsage()
@@ -245,6 +253,9 @@ final class ESimDetailViewController: UIViewController {
     }
     
     private func configure() {
+        // Clear previous info rows to avoid duplication
+        infoStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
+
         // Flag
         if esim.coverage.count == 1 {
             flagLabel.text = flagEmoji(for: esim.coverage[0])
@@ -277,23 +288,39 @@ final class ESimDetailViewController: UIViewController {
         // Info
         addInfoRow(title: NSLocalizedString("esim.detail.iccid", comment: ""),
                    value: esim.iccid ?? NSLocalizedString("esim.detail.not.available", comment: ""))
-        
-        if let activationDate = esim.activationDate {
-            let formatter = DateFormatter()
-            formatter.dateStyle = .medium
-            addInfoRow(title: NSLocalizedString("esim.detail.activated", comment: ""),
-                       value: formatter.string(from: activationDate))
+
+        // Date display based on status
+        if esim.status == .installed {
+            // For installed eSIMs: show activation date and expiration date
+            if let activationDate = esim.activationDate {
+                let formatter = DateFormatter()
+                formatter.dateStyle = .medium
+                formatter.timeStyle = .none
+                addInfoRow(title: NSLocalizedString("esim.detail.activated", comment: ""),
+                           value: formatter.string(from: activationDate))
+            }
+
+            if let expirationDate = esim.expirationDate {
+                let formatter = DateFormatter()
+                formatter.dateStyle = .medium
+                formatter.timeStyle = .none
+                addInfoRow(title: NSLocalizedString("esim.detail.expiration", comment: ""),
+                           value: formatter.string(from: expirationDate))
+            }
+        } else if esim.status == .readyForActivation {
+            // For ready eSIMs: show purchase date (created_at)
+            if let createdAt = esim.createdAt {
+                let formatter = DateFormatter()
+                formatter.dateStyle = .medium
+                formatter.timeStyle = .none
+                addInfoRow(title: NSLocalizedString("esim.detail.purchased", comment: ""),
+                           value: formatter.string(from: createdAt))
+            }
         }
         
-        if let expirationDate = esim.expirationDate {
-            let formatter = DateFormatter()
-            formatter.dateStyle = .medium
-            addInfoRow(title: NSLocalizedString("esim.detail.expiration", comment: ""),
-                       value: formatter.string(from: expirationDate))
-        }
-        
+        let countryNames = esim.coverage.map { countryName(for: $0) }.joined(separator: ", ")
         addInfoRow(title: NSLocalizedString("esim.detail.coverage", comment: ""),
-                   value: esim.coverage.joined(separator: ", "))
+                   value: countryNames)
         
         // Activate button
         activateButton.isHidden = esim.status != .readyForActivation
@@ -324,6 +351,68 @@ final class ESimDetailViewController: UIViewController {
         infoStack.addArrangedSubview(row)
     }
     
+    private func fetchPackageInfo() {
+        Task {
+            do {
+                // First try using package_id
+                if let package = try await plansRepository.fetchPackage(packageId: esim.packageId) {
+                    await MainActor.run {
+                        self.packageInfo = package
+                        self.addPackageFeatures(package)
+                    }
+                    return
+                }
+
+                // Fallback: fetch by country and filter
+                if let countryCode = esim.coverage.first {
+                    let localizedCountryName = self.countryName(for: countryCode)
+                    let packages = try await plansRepository.fetchPackages(countryName: localizedCountryName)
+                    if let package = packages.first(where: { $0.package_id == esim.packageId }) {
+                        await MainActor.run {
+                            self.packageInfo = package
+                            self.addPackageFeatures(package)
+                        }
+                    }
+                }
+            } catch {
+                // Silently fail - package info is optional
+            }
+        }
+    }
+
+    private func addPackageFeatures(_ package: PackageRow) {
+        // Data
+        let dataDisplay = "\(package.dataAmount) \(package.dataUnit)"
+        addInfoRow(title: NSLocalizedString("package.data", comment: "Datos"),
+                   value: dataDisplay)
+
+        // Calls
+        if package.withCall == true {
+            var callsValue = NSLocalizedString("package.included", comment: "Incluidas")
+            if let amount = package.callAmount, let unit = package.callUnit {
+                callsValue = "\(amount) \(unit)"
+            }
+            addInfoRow(title: NSLocalizedString("package.calls", comment: "Llamadas"),
+                       value: callsValue)
+        }
+
+        // SMS
+        if package.withSMS == true {
+            var smsValue = NSLocalizedString("package.included", comment: "Incluidos")
+            if let amount = package.smsAmount, let unit = package.smsUnit {
+                smsValue = "\(amount) \(unit)"
+            }
+            addInfoRow(title: NSLocalizedString("package.sms", comment: "SMS"),
+                       value: smsValue)
+        }
+
+        // Hotspot
+        if package.withHotspot == true {
+            addInfoRow(title: NSLocalizedString("package.hotspot", comment: "Hotspot"),
+                       value: NSLocalizedString("package.available", comment: "Disponible"))
+        }
+    }
+
     private func fetchUsage() {
         guard let repository else { return }
         usageLoader.startAnimating()
@@ -476,5 +565,11 @@ final class ESimDetailViewController: UIViewController {
             scalars.append(regional)
         }
         return String(scalars.map(Character.init))
+    }
+
+    private func countryName(for countryCode: String) -> String {
+        let code = countryCode.uppercased()
+        let locale = Locale.current
+        return locale.localizedString(forRegionCode: code) ?? code
     }
 }

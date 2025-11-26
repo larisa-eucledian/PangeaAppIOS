@@ -39,13 +39,43 @@ final class RealPlansRepository: PlansRepository {
         let response: CountriesResponseDTO = try await api.send(req)
         var countries = response.data
         
-        // 3. Client-side search filtering 
+        // 3. Client-side search filtering
         if let search = search, !search.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             let searchTerm = search.lowercased()
             countries = countries.filter { country in
-                country.country_name.lowercased().contains(searchTerm) ||
-                country.country_code.lowercased().contains(searchTerm) ||
-                (country.covered_countries?.contains { $0.lowercased().contains(searchTerm) } ?? false)
+                // Search in country name (as provided by backend)
+                if country.country_name.lowercased().contains(searchTerm) {
+                    return true
+                }
+
+                // Search in country code
+                if country.country_code.lowercased().contains(searchTerm) {
+                    return true
+                }
+
+                // Search in localized country name (e.g., "México" when device is in Spanish)
+                let localizedName = self.countryName(for: country.country_code)
+                if localizedName.lowercased().contains(searchTerm) {
+                    return true
+                }
+
+                // Search in covered countries (both codes and localized names)
+                if let coveredCountries = country.covered_countries {
+                    for countryCode in coveredCountries {
+                        // Match country code (e.g., "MX")
+                        if countryCode.lowercased().contains(searchTerm) {
+                            return true
+                        }
+
+                        // Match localized country name (e.g., "México", "Mexico")
+                        let countryName = self.countryName(for: countryCode)
+                        if countryName.lowercased().contains(searchTerm) {
+                            return true
+                        }
+                    }
+                }
+
+                return false
             }
         }
         
@@ -57,13 +87,45 @@ final class RealPlansRepository: PlansRepository {
             let req = APIRequest(
                 method: .GET,
                 path: Path.packages,
-                query: ["country": countryName]  
+                query: ["country": countryName]
             )
-            
+
             let response: PackagesResponseDTO = try await api.send(req)
             return response.data
         }
-    
+
+    func fetchPackage(packageId: String) async throws -> PackageRow? {
+        // Backend doesn't support filtering by package_id directly
+        // So we need to fetch all packages and filter client-side
+        // But we don't know the country, so we'll try a direct query first
+        // and if that doesn't work, we'd need to fetch by country
+
+        // For now, let's try the direct approach and see if it returns anything useful
+        let req = APIRequest(
+            method: .GET,
+            path: Path.packages,
+            query: ["package_id": packageId]
+        )
+
+        do {
+            let response: PackagesResponseDTO = try await api.send(req)
+            // Filter client-side to ensure we get the right package
+            return response.data.first { $0.package_id == packageId }
+        } catch {
+            // If the query fails, we can't fetch without knowing the country
+            print("Failed to fetch package with package_id filter: \(error)")
+            return nil
+        }
+    }
+
+    // MARK: - Helpers
+
+    private func countryName(for countryCode: String) -> String {
+        let code = countryCode.uppercased()
+        let locale = Locale.current
+        return locale.localizedString(forRegionCode: code) ?? code
+    }
+
     // MARK: - Response DTOs
     
     private struct CountriesResponseDTO: Decodable {
