@@ -340,8 +340,10 @@ final class ESimDetailViewController: UIViewController {
         print("🔍 Fetching package info for packageId: \(esim.packageId)")
         Task {
             do {
+                // First try using package_id
                 if let package = try await plansRepository.fetchPackage(packageId: esim.packageId) {
                     print("✅ Package fetched: \(package.package)")
+                    print("   Package ID matches: \(package.package_id == esim.packageId)")
                     print("   Data: \(package.dataAmount) \(package.dataUnit)")
                     print("   withCall: \(package.withCall ?? false)")
                     print("   withSMS: \(package.withSMS ?? false)")
@@ -350,8 +352,25 @@ final class ESimDetailViewController: UIViewController {
                         self.packageInfo = package
                         self.addPackageFeatures(package)
                     }
-                } else {
-                    print("⚠️ Package not found for packageId: \(esim.packageId)")
+                    return
+                }
+
+                // Fallback: fetch by country and filter
+                print("⚠️ Direct fetch failed, trying by country...")
+                if let countryCode = esim.coverage.first {
+                    let localizedCountryName = self.countryName(for: countryCode)
+                    print("   Fetching packages for country: \(localizedCountryName)")
+                    let packages = try await plansRepository.fetchPackages(countryName: localizedCountryName)
+                    print("   Found \(packages.count) packages")
+                    if let package = packages.first(where: { $0.package_id == esim.packageId }) {
+                        print("✅ Package found via country filter: \(package.package)")
+                        await MainActor.run {
+                            self.packageInfo = package
+                            self.addPackageFeatures(package)
+                        }
+                    } else {
+                        print("⚠️ Package not found in country packages")
+                    }
                 }
             } catch {
                 print("❌ Failed to fetch package info: \(error)")
