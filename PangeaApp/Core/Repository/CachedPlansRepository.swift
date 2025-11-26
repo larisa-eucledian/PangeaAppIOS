@@ -55,7 +55,20 @@ final class CachedPlansRepository: PlansRepository {
         let response: PackagesResponseDTO = try await api.send(request)
         return response.data
     }
-    
+
+    func fetchPackage(packageId: String) async throws -> PackageRow? {
+        let request = APIRequest(
+            method: .GET,
+            path: "tenant/packages",
+            query: ["package_id": packageId],
+            headers: nil,
+            jsonBody: nil
+        )
+
+        let response: PackagesResponseDTO = try await api.send(request)
+        return response.data.first
+    }
+
     // MARK: - Private: Cache Operations
     
     private func fetchCountriesFromCache(geography: Geography?, search: String?) -> [CountryRow] {

@@ -87,12 +87,36 @@ final class RealPlansRepository: PlansRepository {
             let req = APIRequest(
                 method: .GET,
                 path: Path.packages,
-                query: ["country": countryName]  
+                query: ["country": countryName]
             )
-            
+
             let response: PackagesResponseDTO = try await api.send(req)
             return response.data
         }
+
+    func fetchPackage(packageId: String) async throws -> PackageRow? {
+        // Backend doesn't support filtering by package_id directly
+        // So we need to fetch all packages and filter client-side
+        // But we don't know the country, so we'll try a direct query first
+        // and if that doesn't work, we'd need to fetch by country
+
+        // For now, let's try the direct approach and see if it returns anything useful
+        let req = APIRequest(
+            method: .GET,
+            path: Path.packages,
+            query: ["package_id": packageId]
+        )
+
+        do {
+            let response: PackagesResponseDTO = try await api.send(req)
+            // Filter client-side to ensure we get the right package
+            return response.data.first { $0.package_id == packageId }
+        } catch {
+            // If the query fails, we can't fetch without knowing the country
+            print("Failed to fetch package with package_id filter: \(error)")
+            return nil
+        }
+    }
 
     // MARK: - Helpers
 

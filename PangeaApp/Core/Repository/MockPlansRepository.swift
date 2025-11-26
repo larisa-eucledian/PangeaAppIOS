@@ -100,6 +100,17 @@ final class MockPlansRepository: PlansRepository {
         return dict[code] ?? []
     }
 
+    func fetchPackage(packageId: String) async throws -> PackageRow? {
+        // Load all packages and find the one with matching package_id
+        let dict: [String: [PackageRow]] = try load("packages_mock.json")
+        for (_, packages) in dict {
+            if let package = packages.first(where: { $0.package_id == packageId }) {
+                return package
+            }
+        }
+        return nil
+    }
+
     // MARK: - Loader
 
     private func load<T: Decodable>(_ name: String) throws -> T {
