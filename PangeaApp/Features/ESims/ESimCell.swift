@@ -125,14 +125,18 @@ final class ESimCell: UITableViewCell {
         case .installed:
             // Active: show activation date, expiration, ICCID
             var info = ""
-            
+
+            print("📱 eSIM [\(esim.packageName)] - Status: INSTALLED")
+            print("   activationDate: \(esim.activationDate?.description ?? "nil")")
+            print("   expirationDate: \(esim.expirationDate?.description ?? "nil")")
+
             if let activationDate = esim.activationDate {
                 let formatter = DateFormatter()
                 formatter.dateStyle = .medium
                 let dateStr = formatter.string(from: activationDate)
                 info += String(format: NSLocalizedString("esim.activated.on", comment: ""), dateStr)
             }
-            
+
             if let expirationDate = esim.expirationDate {
                 let formatter = DateFormatter()
                 formatter.dateStyle = .medium
@@ -150,14 +154,17 @@ final class ESimCell: UITableViewCell {
         case .readyForActivation:
             // Not activated: show purchase date
             var info = ""
-            
+
+            print("📱 eSIM [\(esim.packageName)] - Status: READY FOR ACTIVATION")
+            print("   createdAt: \(esim.createdAt?.description ?? "nil")")
+
             if let createdAt = esim.createdAt {
                 let formatter = DateFormatter()
                 formatter.dateStyle = .medium
                 let dateStr = formatter.string(from: createdAt)
                 info = String(format: NSLocalizedString("esim.purchased.on", comment: ""), dateStr)
             }
-            
+
             infoLabel.text = info
             ctaLabel.text = NSLocalizedString("esim.activate.cta", comment: "")
             

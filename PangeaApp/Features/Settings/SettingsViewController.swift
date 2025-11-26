@@ -18,10 +18,19 @@ final class SettingsViewController: UITableViewController {
     }
 
     private func setupUserHeader() {
+        print("⚙️ Settings: setupUserHeader called")
+        print("⚙️ Settings: Session exists: \(SessionManager.shared.session != nil)")
+        if let session = SessionManager.shared.session {
+            print("⚙️ Settings: User email: '\(session.user.email)'")
+            print("⚙️ Settings: User username: '\(session.user.username)'")
+        }
+
         guard let userEmail = SessionManager.shared.session?.user.email, !userEmail.isEmpty else {
+            print("⚠️ Settings: No email found, header not shown")
             return
         }
 
+        print("✅ Settings: Showing email header: \(userEmail)")
         let headerView = UIView()
         headerView.backgroundColor = AppColor.card
 
