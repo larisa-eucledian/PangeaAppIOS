@@ -15,6 +15,23 @@ final class SettingsViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUserHeader()
+
+        // Listen for session changes (login/logout)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(sessionDidChange),
+            name: SessionManager.sessionDidChange,
+            object: nil
+        )
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
+    @objc private func sessionDidChange() {
+        print("⚙️ Settings: Session changed, refreshing header")
+        setupUserHeader()
     }
 
     private func setupUserHeader() {
@@ -24,6 +41,9 @@ final class SettingsViewController: UITableViewController {
             print("⚙️ Settings: User email: '\(session.user.email)'")
             print("⚙️ Settings: User username: '\(session.user.username)'")
         }
+
+        // Remove old header if exists
+        tableView.tableHeaderView = nil
 
         guard let userEmail = SessionManager.shared.session?.user.email, !userEmail.isEmpty else {
             print("⚠️ Settings: No email found, header not shown")
