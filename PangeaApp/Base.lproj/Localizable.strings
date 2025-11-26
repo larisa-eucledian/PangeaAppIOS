@@ -158,3 +158,11 @@ checkout.status.ready = "Payment ready. You can pay securely.";
 checkout.status.success = "Payment completed successfully!";
 checkout.status.canceled = "Payment canceled.";
 checkout.secure.info = "Pay securely with:";
+
+// Package info in eSIM detail
+package.data = "Data";
+package.calls = "Calls";
+package.sms = "SMS";
+package.hotspot = "Hotspot";
+package.included = "Included";
+package.available = "Available";
