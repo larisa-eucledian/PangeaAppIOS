@@ -288,19 +288,34 @@ final class ESimDetailViewController: UIViewController {
         // Info
         addInfoRow(title: NSLocalizedString("esim.detail.iccid", comment: ""),
                    value: esim.iccid ?? NSLocalizedString("esim.detail.not.available", comment: ""))
-        
-        if let activationDate = esim.activationDate {
-            let formatter = DateFormatter()
-            formatter.dateStyle = .medium
-            addInfoRow(title: NSLocalizedString("esim.detail.activated", comment: ""),
-                       value: formatter.string(from: activationDate))
-        }
-        
-        if let expirationDate = esim.expirationDate {
-            let formatter = DateFormatter()
-            formatter.dateStyle = .medium
-            addInfoRow(title: NSLocalizedString("esim.detail.expiration", comment: ""),
-                       value: formatter.string(from: expirationDate))
+
+        // Date display based on status
+        if esim.status == .installed {
+            // For installed eSIMs: show activation date and expiration date
+            if let activationDate = esim.activationDate {
+                let formatter = DateFormatter()
+                formatter.dateStyle = .medium
+                formatter.timeStyle = .none
+                addInfoRow(title: NSLocalizedString("esim.detail.activated", comment: ""),
+                           value: formatter.string(from: activationDate))
+            }
+
+            if let expirationDate = esim.expirationDate {
+                let formatter = DateFormatter()
+                formatter.dateStyle = .medium
+                formatter.timeStyle = .none
+                addInfoRow(title: NSLocalizedString("esim.detail.expiration", comment: ""),
+                           value: formatter.string(from: expirationDate))
+            }
+        } else if esim.status == .readyForActivation {
+            // For ready eSIMs: show purchase date (created_at)
+            if let createdAt = esim.createdAt {
+                let formatter = DateFormatter()
+                formatter.dateStyle = .medium
+                formatter.timeStyle = .none
+                addInfoRow(title: NSLocalizedString("esim.detail.purchased", comment: ""),
+                           value: formatter.string(from: createdAt))
+            }
         }
         
         let countryNames = esim.coverage.map { countryName(for: $0) }.joined(separator: ", ")
