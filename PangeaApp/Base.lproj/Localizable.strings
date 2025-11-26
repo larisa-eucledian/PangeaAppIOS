@@ -80,6 +80,7 @@ esim.check.usage = "Check your usage here";
 esim.activate.cta = "Your eSIM is not active yet. Activate and install it here to enjoy its benefits";
 esim.quick.install = "Quick Install";
 esim.detail.activated = "Activated";
+esim.detail.purchased = "Purchased";
 esim.usage.data = "Data";
 esim.usage.sms = "SMS";
 esim.usage.voice = "Voice";

@@ -81,6 +81,7 @@ esim.check.usage = "Consulta tu uso aquí";
 esim.activate.cta = "Tu eSIM aún no está activa. Actívala e instálala aquí para disfrutar sus beneficios.";
 esim.quick.install = "Instalación rápida";
 esim.detail.activated = "Activada";
+esim.detail.purchased = "Comprada";
 esim.usage.data = "Datos";
 esim.usage.sms = "SMS";
 esim.usage.voice = "Voz";
