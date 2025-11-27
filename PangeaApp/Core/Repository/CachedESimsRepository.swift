@@ -3,11 +3,15 @@
 //  PangeaApp
 //
 //  Created: 23/11/25
-//  eSIMs repository with network-first strategy + cache backup
+//  eSIMs repository with cache-then-network strategy
 //
 
 import Foundation
 import CoreData
+
+extension Notification.Name {
+    static let esimsDataUpdated = Notification.Name("esimsDataUpdated")
+}
 
 final class CachedESimsRepository: ESimsRepository {
     
@@ -19,33 +23,44 @@ final class CachedESimsRepository: ESimsRepository {
         self.api = api
     }
     
-    // MARK: - Fetch eSIMs (Network-First with cache backup)
-    
+    // MARK: - Fetch eSIMs (Cache-then-Network)
+
     func fetchESims() async throws -> [ESimRow] {
-        do {
-            // 1. Try network first (critical data)
-            let esims = try await fetchESimsFromNetwork()
-            print("Loaded \(esims.count) eSIMs from network")
-            
-            // Save to cache in background
-            Task.detached { [weak self] in
-                self?.saveESimsToCache(esims)
+        // 1. Get cached data immediately
+        let cached = fetchESimsFromCache()
+
+        // 2. Start network fetch in background (always)
+        Task.detached { [weak self] in
+            do {
+                let fresh = try await self?.fetchESimsFromNetwork()
+                guard let fresh = fresh, let self = self else { return }
+
+                print("✅ Fetched \(fresh.count) eSIMs from network (background)")
+
+                // Save to cache
+                await MainActor.run {
+                    self.saveESimsToCache(fresh)
+
+                    // Notify observers that data updated
+                    NotificationCenter.default.post(
+                        name: .esimsDataUpdated,
+                        object: fresh
+                    )
+                }
+            } catch {
+                print("⚠️ Background network fetch failed: \(error)")
             }
-            
-            return esims
-        } catch {
-            // 2. Network failed - fallback to cache
-            print("Network failed, trying cache...")
-            let cached = fetchESimsFromCache()
-            
-            if !cached.isEmpty {
-                print("Loaded \(cached.count) eSIMs from cache (offline mode)")
-                return cached
-            }
-            
-            // 3. No cache available - throw error
-            throw error
         }
+
+        // 3. Return cached data if available
+        if !cached.isEmpty {
+            print("📦 Returning \(cached.count) eSIMs from cache (instant)")
+            return cached
+        }
+
+        // 4. No cache - wait for network (first time only)
+        print("🔄 No cache, waiting for network...")
+        return try await fetchESimsFromNetwork()
     }
     
     // MARK: - Activate eSIM
