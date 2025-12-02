@@ -159,21 +159,26 @@ final class CachedPlansRepository: PlansRepository {
     private func fetchCountriesFromCache(geography: Geography?, search: String?) -> [CountryRow] {
         let context = cacheManager.context
         let fetchRequest: NSFetchRequest<CachedCountry> = CachedCountry.fetchRequest()
-        
+
         var predicates: [NSPredicate] = []
-        
+
         // Check cache validity (24h)
         let validDate = Date().addingTimeInterval(-Double(cacheValidityHours * 3600))
         predicates.append(NSPredicate(format: "lastUpdated >= %@", validDate as NSDate))
-        
+
+        // Geography filter (Core Data level)
+        if let geo = geography {
+            predicates.append(NSPredicate(format: "geography == %@", geo.rawValue))
+        }
+
         // Search filter
         if let searchText = search?.lowercased(), !searchText.isEmpty {
             predicates.append(NSPredicate(format: "countryName CONTAINS[cd] %@", searchText))
         }
-        
+
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "countryName", ascending: true)]
-        
+
         do {
             let cached = try context.fetch(fetchRequest)
             print("Cache fetch: found \(cached.count) raw entities (geography filter: \(geography?.rawValue ?? "NONE"))")
