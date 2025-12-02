@@ -88,7 +88,7 @@ final class CachedESimsRepository: ESimsRepository {
     }
     
     // MARK: - Fetch Usage
-    
+
     func fetchUsage(esimId: String) async throws -> ESimUsage {
         let request = APIRequest(
             method: .GET,
@@ -97,9 +97,23 @@ final class CachedESimsRepository: ESimsRepository {
             headers: nil,
             jsonBody: nil
         )
-        
+
         let response: ESimUsageResponseDTO = try await api.send(request)
         return response.toDomain()
+    }
+
+    // MARK: - Cache Management
+
+    func clearCache() {
+        let context = cacheManager.context
+
+        context.perform {
+            let fetchRequest: NSFetchRequest<NSFetchRequestResult> = CachedESim.fetchRequest()
+            let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+            try? context.execute(deleteRequest)
+            self.cacheManager.save()
+            print("🗑️ Cleared eSIMs cache")
+        }
     }
     
     // MARK: - Private: Network Operations

@@ -3,57 +3,121 @@
 //  PangeaApp
 //
 //  Created: 23/11/25
-//  Plans repository with cache-first strategy
+//  Plans repository with cache-then-network strategy
 //
 
 import Foundation
 import CoreData
 
+extension Notification.Name {
+    static let countriesDataUpdated = Notification.Name("countriesDataUpdated")
+    static let packagesDataUpdated = Notification.Name("packagesDataUpdated")
+}
+
 final class CachedPlansRepository: PlansRepository {
-    
+
     private let api: APIClient
     private let cacheManager = CacheManager.shared
     private let cacheValidityHours = 24
-    
+
+    // In-memory cache for packages (keyed by country name)
+    private var packagesCache: [String: (packages: [PackageRow], timestamp: Date)] = [:]
+    private let packagesCacheValidityMinutes = 30 // 30 minutes for packages
+    private let cacheQueue = DispatchQueue(label: "com.pangea.packagescache", attributes: .concurrent)
+
     init(api: APIClient) {
         self.api = api
     }
     
-    // MARK: - Fetch Countries (Cache-First)
-    
+    // MARK: - Fetch Countries (Cache-then-Network)
+
     func fetchCountries(geography: Geography?, search: String?) async throws -> [CountryRow] {
-        // 1. Try cache first
+        // 1. Get cached data immediately
         let cached = fetchCountriesFromCache(geography: geography, search: search)
-        
-        if !cached.isEmpty {
-            print("Loaded \(cached.count) countries from cache (geography: \(geography?.rawValue ?? "nil"))")
-            
-            // Refresh in background ONLY if online
-            Task.detached { [weak self] in
-                try? await self?.refreshCountriesIfNeeded()
+
+        // 2. Start network fetch in background (always)
+        Task.detached { [weak self] in
+            do {
+                let fresh = try await self?.fetchCountriesFromNetwork(geography: geography, search: search)
+                guard let fresh = fresh, let self = self else { return }
+
+                print("✅ Fetched \(fresh.count) countries from network (background)")
+
+                // Notify observers that data updated
+                await MainActor.run {
+                    NotificationCenter.default.post(
+                        name: .countriesDataUpdated,
+                        object: fresh
+                    )
+                }
+            } catch {
+                print("⚠️ Background network fetch failed: \(error)")
             }
-            
+        }
+
+        // 3. Return cached data if available
+        if !cached.isEmpty {
+            print("📦 Returning \(cached.count) countries from cache (instant)")
             return cached
         }
-        
-        // 2. No cache for this geography - fetch from network
-        print("Fetching countries from network (geography: \(geography?.rawValue ?? "nil"))...")
+
+        // 4. No cache - wait for network (first time only)
+        print("🔄 No cache, waiting for network...")
         return try await fetchCountriesFromNetwork(geography: geography, search: search)
     }
     
-    // MARK: - Fetch Packages (Network-only)
-    
+    // MARK: - Fetch Packages (Cache-then-Network)
+
     func fetchPackages(countryName: String) async throws -> [PackageRow] {
-        let request = APIRequest(
-            method: .GET,
-            path: "tenant/packages",
-            query: ["country": countryName],
-            headers: nil,
-            jsonBody: nil
-        )
-        
-        let response: PackagesResponseDTO = try await api.send(request)
-        return response.data
+        // 1. Get cached data immediately (thread-safe read)
+        let cached = cacheQueue.sync { () -> [PackageRow]? in
+            guard let entry = packagesCache[countryName] else { return nil }
+
+            // Check if cache is still valid (30 minutes)
+            let age = Date().timeIntervalSince(entry.timestamp)
+            let validitySeconds = Double(packagesCacheValidityMinutes * 60)
+
+            if age < validitySeconds {
+                return entry.packages
+            } else {
+                return nil // Cache expired
+            }
+        }
+
+        // 2. Start network fetch in background (always)
+        Task.detached { [weak self] in
+            do {
+                let fresh = try await self?.fetchPackagesFromNetwork(countryName: countryName)
+                guard let fresh = fresh, let self = self else { return }
+
+                print("✅ Fetched \(fresh.count) packages for \(countryName) from network (background)")
+
+                // Save to in-memory cache (thread-safe write)
+                self.cacheQueue.async(flags: .barrier) {
+                    self.packagesCache[countryName] = (packages: fresh, timestamp: Date())
+                }
+
+                // Notify observers that data updated
+                await MainActor.run {
+                    NotificationCenter.default.post(
+                        name: .packagesDataUpdated,
+                        object: (countryName: countryName, packages: fresh)
+                    )
+                }
+            } catch {
+                print("⚠️ Background network fetch for packages failed: \(error)")
+            }
+        }
+
+        // 3. Return cached data if available
+        if let cachedPackages = cached, !cachedPackages.isEmpty {
+            print("📦 Returning \(cachedPackages.count) packages for \(countryName) from cache (instant)")
+            return cachedPackages
+        }
+
+        // 4. No cache - wait for network (first time only)
+        print("🔄 No cache for \(countryName), waiting for network...")
+        return try await fetchPackagesFromNetwork(countryName: countryName)
     }
 
     func fetchPackage(packageId: String) async throws -> PackageRow? {
@@ -67,6 +131,27 @@ final class CachedPlansRepository: PlansRepository {
 
         let response: PackagesResponseDTO = try await api.send(request)
         return response.data.first
+    }
+
+    // MARK: - Cache Management
+
+    func clearCache() {
+        // Clear Core Data countries cache
+        let context = cacheManager.context
+
+        context.perform {
+            let fetchRequest: NSFetchRequest<NSFetchRequestResult> = CachedCountry.fetchRequest()
+            let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+            try? context.execute(deleteRequest)
+            self.cacheManager.save()
+            print("🗑️ Cleared countries cache")
+        }
+
+        // Clear in-memory packages cache
+        cacheQueue.async(flags: .barrier) {
+            self.packagesCache.removeAll()
+            print("🗑️ Cleared packages cache")
+        }
     }
 
     // MARK: - Private: Cache Operations
@@ -136,6 +221,19 @@ final class CachedPlansRepository: PlansRepository {
         return countries
     }
     
+    private func fetchPackagesFromNetwork(countryName: String) async throws -> [PackageRow] {
+        let request = APIRequest(
+            method: .GET,
+            path: "tenant/packages",
+            query: ["country": countryName],
+            headers: nil,
+            jsonBody: nil
+        )
+
+        let response: PackagesResponseDTO = try await api.send(request)
+        return response.data
+    }
+
     private func refreshCountriesIfNeeded() async throws {
         // Check if cache needs refresh
         let context = cacheManager.context

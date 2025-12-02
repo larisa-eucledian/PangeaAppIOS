@@ -481,6 +481,22 @@ final class CheckoutViewController: UIViewController {
         present(ac, animated: true)
     }
 
+    // MARK: - Cache Invalidation
+
+    private func invalidateCaches() {
+        // Clear eSIMs cache
+        if let cachedESimsRepo = AppDependencies.shared.esimsRepository as? CachedESimsRepository {
+            cachedESimsRepo.clearCache()
+        }
+
+        // Clear plans cache (countries and packages)
+        if let cachedPlansRepo = AppDependencies.shared.plansRepository as? CachedPlansRepository {
+            cachedPlansRepo.clearCache()
+        }
+
+        print("🔄 Caches invalidated after purchase")
+    }
+
     // MARK: - Actions
 
     @objc private func onPayTapped() {
@@ -490,7 +506,10 @@ final class CheckoutViewController: UIViewController {
 
             switch result {
                 case .completed:
-                    // Success - notify eSIMs list and go to tab
+                    // Success - clear caches to refresh data
+                    self.invalidateCaches()
+
+                    // Notify eSIMs list and go to tab
                     NotificationCenter.default.post(name: .eSimPurchaseCompleted, object: nil)
 
                     self.navigationController?.popToRootViewController(animated: true)
