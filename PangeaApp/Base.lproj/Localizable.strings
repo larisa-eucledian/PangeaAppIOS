@@ -85,6 +85,8 @@ esim.usage.data = "Data";
 esim.usage.sms = "SMS";
 esim.usage.voice = "Voice";
 error.title = "Error";
+error.packages.offline.title = "No Connection";
+error.packages.offline.message = "Unable to load packages. Please check your internet connection and try again.";
 
 
 auth.login.title = "Log in";

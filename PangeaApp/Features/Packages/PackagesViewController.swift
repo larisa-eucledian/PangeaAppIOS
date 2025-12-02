@@ -135,10 +135,26 @@ final class PackagesViewController: UIViewController, UISearchResultsUpdating, U
                        self.applyFilter()
                    }
                } catch {
-                   print("packages error:", error) // TODO: mostrar alerta localizada
+                   print("packages error:", error)
+                   await MainActor.run {
+                       self.showOfflineError()
+                   }
                }
            }
        }
+
+    private func showOfflineError() {
+        let alert = UIAlertController(
+            title: NSLocalizedString("error.packages.offline.title", comment: ""),
+            message: NSLocalizedString("error.packages.offline.message", comment: ""),
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(
+            title: NSLocalizedString("general.ok", comment: ""),
+            style: .default
+        ))
+        present(alert, animated: true)
+    }
 
     // MARK: - UISearchResultsUpdating
     func updateSearchResults(for searchController: UISearchController) {
