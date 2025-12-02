@@ -135,20 +135,26 @@ final class CachedESimsRepository: ESimsRepository {
     
     private func fetchESimsFromCache() -> [ESimRow] {
         let context = cacheManager.context
-        let fetchRequest: NSFetchRequest<CachedESim> = CachedESim.fetchRequest()
-        
-        // Check cache validity (1 hour)
-        let validDate = Date().addingTimeInterval(-Double(cacheValidityMinutes * 60))
-        fetchRequest.predicate = NSPredicate(format: "lastUpdated >= %@", validDate as NSDate)
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
-        
-        do {
-            let cached = try context.fetch(fetchRequest)
-            return cached.compactMap { $0.toESimRow() }
-        } catch {
-            print("Cache fetch error: \(error)")
-            return []
+
+        var result: [ESimRow] = []
+
+        context.performAndWait {
+            let fetchRequest: NSFetchRequest<CachedESim> = CachedESim.fetchRequest()
+
+            // Check cache validity (1 hour)
+            let validDate = Date().addingTimeInterval(-Double(cacheValidityMinutes * 60))
+            fetchRequest.predicate = NSPredicate(format: "lastUpdated >= %@", validDate as NSDate)
+            fetchRequest.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
+
+            do {
+                let cached = try context.fetch(fetchRequest)
+                result = cached.compactMap { $0.toESimRow() }
+            } catch {
+                print("Cache fetch error: \(error)")
+            }
         }
+
+        return result
     }
     
     private func saveESimsToCache(_ esims: [ESimRow]) {
