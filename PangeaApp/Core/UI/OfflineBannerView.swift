@@ -17,7 +17,7 @@ final class OfflineBannerView: UIView {
         layer.masksToBounds = true
 
         label.text = NSLocalizedString("net.offline", comment: "Sin conexión a Internet.")
-        label.font = UIFont.preferredFont(forTextStyle: .footnote).withWeight(.semibold)
+        label.font = UIFont.systemFont(ofSize: 13, weight: .semibold)
         label.adjustsFontForContentSizeCategory = true
         label.textColor = .white
         label.textAlignment = .center
