@@ -139,6 +139,8 @@ common.cancel = "Abbrechen";
 
 net.offline = "Keine Internetverbindung.";
 general.ok = "OK";
+general.retry = "Wiederholen";
+general.cancel = "Abbrechen";
 general.error = "Fehler";
 
 title.checkout = "Bezahlen";

@@ -162,8 +162,15 @@ final class PackagesViewController: UIViewController, UISearchResultsUpdating, U
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(
-            title: NSLocalizedString("general.ok", comment: ""),
-            style: .default
+            title: NSLocalizedString("general.retry", comment: ""),
+            style: .default,
+            handler: { [weak self] _ in
+                self?.load()
+            }
+        ))
+        alert.addAction(UIAlertAction(
+            title: NSLocalizedString("general.cancel", comment: ""),
+            style: .cancel
         ))
         present(alert, animated: true)
     }
