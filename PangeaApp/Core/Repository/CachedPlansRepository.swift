@@ -32,22 +32,36 @@ final class CachedPlansRepository: PlansRepository {
     // MARK: - Fetch Countries (Cache-then-Network)
 
     func fetchCountries(geography: Geography?, search: String?) async throws -> [CountryRow] {
-        // 1. Get cached data immediately
+        // 1. Get cached data immediately (with client-side filtering)
         let cached = fetchCountriesFromCache(geography: geography, search: search)
 
-        // 2. Start network fetch in background (always)
+        // 2. Start network fetch in background (always fetch ALL countries)
         Task.detached { [weak self] in
             do {
-                let fresh = try await self?.fetchCountriesFromNetwork(geography: geography, search: search)
-                guard let fresh = fresh, let self = self else { return }
+                // Always fetch all countries (no geography filter to API)
+                let allFresh = try await self?.fetchCountriesFromNetwork(geography: nil, search: nil)
+                guard let allFresh = allFresh, let self = self else { return }
 
-                print("✅ Fetched \(fresh.count) countries from network (background)")
+                print("✅ Fetched \(allFresh.count) countries from network (background)")
 
-                // Notify observers that data updated
+                // Apply client-side filtering for the notification
+                var filteredFresh = allFresh
+                if let geo = geography {
+                    filteredFresh = allFresh.filter { $0.geography == geo }
+                }
+                if let searchTerm = search?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(), !searchTerm.isEmpty {
+                    filteredFresh = filteredFresh.filter { country in
+                        country.country_name.lowercased().contains(searchTerm) ||
+                        country.country_code.lowercased().contains(searchTerm) ||
+                        (country.covered_countries?.contains { $0.lowercased().contains(searchTerm) } ?? false)
+                    }
+                }
+
+                // Notify observers with filtered data
                 await MainActor.run {
                     NotificationCenter.default.post(
                         name: .countriesDataUpdated,
-                        object: fresh
+                        object: filteredFresh
                     )
                 }
             } catch {
@@ -63,7 +77,22 @@ final class CachedPlansRepository: PlansRepository {
 
         // 4. No cache - wait for network (first time only)
         print("🔄 No cache, waiting for network...")
-        return try await fetchCountriesFromNetwork(geography: geography, search: search)
+        let allCountries = try await fetchCountriesFromNetwork(geography: nil, search: nil)
+
+        // Apply client-side filtering
+        var filtered = allCountries
+        if let geo = geography {
+            filtered = allCountries.filter { $0.geography == geo }
+        }
+        if let searchTerm = search?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(), !searchTerm.isEmpty {
+            filtered = filtered.filter { country in
+                country.country_name.lowercased().contains(searchTerm) ||
+                country.country_code.lowercased().contains(searchTerm) ||
+                (country.covered_countries?.contains { $0.lowercased().contains(searchTerm) } ?? false)
+            }
+        }
+
+        return filtered
     }
     
     // MARK: - Fetch Packages (Cache-then-Network)
