@@ -59,6 +59,10 @@ final class PackagesViewController: UIViewController, UISearchResultsUpdating, U
 
     required init?(coder: NSCoder) { super.init(coder: coder) }
 
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
         override func viewDidLoad() {
             super.viewDidLoad()
             setNavBarLogo()
@@ -71,6 +75,14 @@ final class PackagesViewController: UIViewController, UISearchResultsUpdating, U
 
             title = NSLocalizedString("title.packages", comment: "")
             view.backgroundColor = .systemBackground
+
+            // Listen for cache updates (when fresh data arrives from network)
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(handleDataUpdated),
+                name: .packagesDataUpdated,
+                object: nil
+            )
 
             // Search en la NavBar
             navigationController?.navigationBar.prefersLargeTitles = true
@@ -135,10 +147,43 @@ final class PackagesViewController: UIViewController, UISearchResultsUpdating, U
                        self.applyFilter()
                    }
                } catch {
-                   print("packages error:", error) // TODO: mostrar alerta localizada
+                   print("packages error:", error)
+                   await MainActor.run {
+                       self.showOfflineError()
+                   }
                }
            }
        }
+
+    private func showOfflineError() {
+        let alert = UIAlertController(
+            title: NSLocalizedString("error.packages.offline.title", comment: ""),
+            message: NSLocalizedString("error.packages.offline.message", comment: ""),
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(
+            title: NSLocalizedString("general.retry", comment: ""),
+            style: .default,
+            handler: { [weak self] _ in
+                self?.load()
+            }
+        ))
+        alert.addAction(UIAlertAction(
+            title: NSLocalizedString("general.cancel", comment: ""),
+            style: .cancel
+        ))
+        present(alert, animated: true)
+    }
+
+    @objc private func handleDataUpdated(_ notification: Notification) {
+        // Fresh data arrived from network in background
+        print("🔔 Packages data updated notification received")
+        if let data = notification.object as? (countryName: String, packages: [PackageRow]),
+           data.countryName == self.countryName {
+            self.all = data.packages
+            self.applyFilter()
+        }
+    }
 
     // MARK: - UISearchResultsUpdating
     func updateSearchResults(for searchController: UISearchController) {

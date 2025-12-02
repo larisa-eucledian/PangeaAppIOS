@@ -7,8 +7,8 @@ final class AppDependencies {
 
     lazy var plansRepository: PlansRepository = {
         //return MockPlansRepository()
-        //return CachedPlansRepository(api: apiClient)
-        return RealPlansRepository(api: apiClient)
+        return CachedPlansRepository(api: apiClient)
+        //return RealPlansRepository(api: apiClient)
     }()
 
 
@@ -26,8 +26,8 @@ final class AppDependencies {
     }()
 
     lazy var esimsRepository: ESimsRepository = {
-        //return CachedESimsRepository(api: apiClient)
-        return RealESimsRepository(api: apiClient)
+        return CachedESimsRepository(api: apiClient)
+        //return RealESimsRepository(api: apiClient)
     }()
     
     lazy var transactionRepository: TransactionRepository = {

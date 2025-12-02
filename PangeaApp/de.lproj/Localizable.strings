@@ -89,6 +89,10 @@ esim.usage.voice = "Sprache";
 
 // Error
 error.title = "Fehler";
+error.packages.offline.title = "Keine Verbindung";
+error.packages.offline.message = "Pakete können nicht geladen werden. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.";
+error.esims.offline.title = "Keine Verbindung";
+error.esims.offline.message = "Ihre eSIMs können nicht geladen werden. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.";
 
 auth.login.title = "Anmelden";
 auth.email.placeholder = "E-Mail";
@@ -135,6 +139,8 @@ common.cancel = "Abbrechen";
 
 net.offline = "Keine Internetverbindung.";
 general.ok = "OK";
+general.retry = "Wiederholen";
+general.cancel = "Abbrechen";
 general.error = "Fehler";
 
 title.checkout = "Bezahlen";
