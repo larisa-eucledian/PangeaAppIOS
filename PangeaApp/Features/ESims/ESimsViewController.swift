@@ -53,6 +53,14 @@ final class ESimsViewController: UIViewController, UITableViewDelegate {
             name: .eSimPurchaseCompleted,
             object: nil
         )
+
+        // Listen for cache updates (when fresh data arrives from network)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleDataUpdated),
+            name: .esimsDataUpdated,
+            object: nil
+        )
     }
 
     deinit {
@@ -153,6 +161,20 @@ final class ESimsViewController: UIViewController, UITableViewDelegate {
             self?.load()
         }
     }
+
+    @objc private func handleDataUpdated(_ notification: Notification) {
+        // Fresh data arrived from network in background
+        print("🔔 eSIMs data updated notification received")
+        if let freshData = notification.object as? [ESimRow] {
+            self.esims = freshData.sorted { esim1, esim2 in
+                if esim1.status == esim2.status {
+                    return (esim1.createdAt ?? Date.distantPast) > (esim2.createdAt ?? Date.distantPast)
+                }
+                return esim1.status.rawValue < esim2.status.rawValue
+            }
+            self.applySnapshot()
+        }
+    }
     
     private func load(retryCount: Int = 0, previousCount: Int? = nil) {
         Task {
@@ -226,11 +248,14 @@ final class ESimsViewController: UIViewController, UITableViewDelegate {
     
     private func showError(_ error: Error) {
         let ac = UIAlertController(
-            title: NSLocalizedString("error.title", comment: ""),
-            message: error.localizedDescription,
+            title: NSLocalizedString("error.esims.offline.title", comment: ""),
+            message: NSLocalizedString("error.esims.offline.message", comment: ""),
             preferredStyle: .alert
         )
-        ac.addAction(UIAlertAction(title: "OK", style: .default))
+        ac.addAction(UIAlertAction(
+            title: NSLocalizedString("general.ok", comment: ""),
+            style: .default
+        ))
         present(ac, animated: true)
     }
     

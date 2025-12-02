@@ -91,6 +91,8 @@ esim.usage.voice = "Sprache";
 error.title = "Fehler";
 error.packages.offline.title = "Keine Verbindung";
 error.packages.offline.message = "Pakete können nicht geladen werden. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.";
+error.esims.offline.title = "Keine Verbindung";
+error.esims.offline.message = "Ihre eSIMs können nicht geladen werden. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.";
 
 auth.login.title = "Anmelden";
 auth.email.placeholder = "E-Mail";

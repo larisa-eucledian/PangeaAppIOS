@@ -87,6 +87,8 @@ esim.usage.voice = "Voice";
 error.title = "Error";
 error.packages.offline.title = "No Connection";
 error.packages.offline.message = "Unable to load packages. Please check your internet connection and try again.";
+error.esims.offline.title = "No Connection";
+error.esims.offline.message = "Unable to load your eSIMs. Please check your internet connection and try again.";
 
 
 auth.login.title = "Log in";

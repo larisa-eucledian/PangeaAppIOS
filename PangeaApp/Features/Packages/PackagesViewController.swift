@@ -59,6 +59,10 @@ final class PackagesViewController: UIViewController, UISearchResultsUpdating, U
 
     required init?(coder: NSCoder) { super.init(coder: coder) }
 
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
         override func viewDidLoad() {
             super.viewDidLoad()
             setNavBarLogo()
@@ -71,6 +75,14 @@ final class PackagesViewController: UIViewController, UISearchResultsUpdating, U
 
             title = NSLocalizedString("title.packages", comment: "")
             view.backgroundColor = .systemBackground
+
+            // Listen for cache updates (when fresh data arrives from network)
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(handleDataUpdated),
+                name: .packagesDataUpdated,
+                object: nil
+            )
 
             // Search en la NavBar
             navigationController?.navigationBar.prefersLargeTitles = true
@@ -154,6 +166,16 @@ final class PackagesViewController: UIViewController, UISearchResultsUpdating, U
             style: .default
         ))
         present(alert, animated: true)
+    }
+
+    @objc private func handleDataUpdated(_ notification: Notification) {
+        // Fresh data arrived from network in background
+        print("🔔 Packages data updated notification received")
+        if let data = notification.object as? (countryName: String, packages: [PackageRow]),
+           data.countryName == self.countryName {
+            self.all = data.packages
+            self.applyFilter()
+        }
     }
 
     // MARK: - UISearchResultsUpdating

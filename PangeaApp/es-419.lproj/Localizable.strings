@@ -90,6 +90,8 @@ esim.usage.voice = "Voz";
 error.title = "Error";
 error.packages.offline.title = "Sin Conexión";
 error.packages.offline.message = "No se pudieron cargar los paquetes. Verifica tu conexión a internet e intenta de nuevo.";
+error.esims.offline.title = "Sin Conexión";
+error.esims.offline.message = "No se pudieron cargar tus eSIMs. Verifica tu conexión a internet e intenta de nuevo.";
 
 /* Login */
 auth.login.title = "Iniciar sesión";
