@@ -25,6 +25,9 @@ final class CachedPlansRepository: PlansRepository {
     private let packagesCacheValidityMinutes = 30 // 30 minutes for packages
     private let cacheQueue = DispatchQueue(label: "com.pangea.packagescache", attributes: .concurrent)
 
+    // Serial queue for Core Data write operations to prevent race conditions
+    private let coreDataWriteQueue = DispatchQueue(label: "com.pangea.coredata.write")
+
     init(api: APIClient) {
         self.api = api
     }
@@ -165,15 +168,18 @@ final class CachedPlansRepository: PlansRepository {
     // MARK: - Cache Management
 
     func clearCache() {
-        // Clear Core Data countries cache
-        let context = cacheManager.context
+        // Clear Core Data countries cache (using serial queue to prevent race conditions)
+        coreDataWriteQueue.async { [weak self] in
+            guard let self = self else { return }
+            let context = self.cacheManager.context
 
-        context.perform {
-            let fetchRequest: NSFetchRequest<NSFetchRequestResult> = CachedCountry.fetchRequest()
-            let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-            try? context.execute(deleteRequest)
-            self.cacheManager.save()
-            print("🗑️ Cleared countries cache")
+            context.performAndWait {
+                let fetchRequest: NSFetchRequest<NSFetchRequestResult> = CachedCountry.fetchRequest()
+                let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+                try? context.execute(deleteRequest)
+                self.cacheManager.save()
+                print("🗑️ Cleared countries cache")
+            }
         }
 
         // Clear in-memory packages cache
@@ -292,35 +298,39 @@ final class CachedPlansRepository: PlansRepository {
     }
     
     private func saveCountriesToCache(_ countries: [CountryRow]) {
-        let context = cacheManager.context
-        
-        context.perform {
-            // Clear old cache
-            let fetchRequest: NSFetchRequest<NSFetchRequestResult> = CachedCountry.fetchRequest()
-            let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-            try? context.execute(deleteRequest)
-            
-            // Save new data
-            let now = Date()
-            for country in countries {
-                let cached = CachedCountry(context: context)
-                // No need for countryId - use countryCode as identifier
-                cached.countryName = country.country_name
-                cached.countryCode = country.country_code
-                cached.imageURL = country.image_url
-                cached.geography = country.geography.rawValue
-                cached.packageCount = Int16(country.packageCount ?? 0)
-                cached.lastUpdated = now
-                
-                // Store covered countries as JSON
-                if let covered = country.covered_countries,
-                   let jsonData = try? JSONEncoder().encode(covered) {
-                    cached.coveredCountries = jsonData.base64EncodedString()
+        // Use serial queue to prevent race conditions when saving to Core Data
+        coreDataWriteQueue.async { [weak self] in
+            guard let self = self else { return }
+            let context = self.cacheManager.context
+
+            context.performAndWait {
+                // Clear old cache
+                let fetchRequest: NSFetchRequest<NSFetchRequestResult> = CachedCountry.fetchRequest()
+                let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+                try? context.execute(deleteRequest)
+
+                // Save new data
+                let now = Date()
+                for country in countries {
+                    let cached = CachedCountry(context: context)
+                    // No need for countryId - use countryCode as identifier
+                    cached.countryName = country.country_name
+                    cached.countryCode = country.country_code
+                    cached.imageURL = country.image_url
+                    cached.geography = country.geography.rawValue
+                    cached.packageCount = Int16(country.packageCount ?? 0)
+                    cached.lastUpdated = now
+
+                    // Store covered countries as JSON
+                    if let covered = country.covered_countries,
+                       let jsonData = try? JSONEncoder().encode(covered) {
+                        cached.coveredCountries = jsonData.base64EncodedString()
+                    }
                 }
+
+                self.cacheManager.save()
+                print("✅ Saved \(countries.count) countries to cache")
             }
-            
-            self.cacheManager.save()
-            print("✅ Saved \(countries.count) countries to cache")
         }
     }
     
