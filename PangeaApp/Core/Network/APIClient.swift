@@ -68,6 +68,9 @@ final class DefaultAPIClient: APIClient {
         if let token = tokenProvider(), !token.isEmpty {
             headers["Authorization"] = "Bearer \(token)"
         }
+        
+        headers["X-Tenant-API-Key"] = Config.tenantAPIKey
+        
         for (k,v) in headers { urlReq.setValue(v, forHTTPHeaderField: k) }
         urlReq.httpBody = req.body
         return urlReq
@@ -77,7 +80,7 @@ final class DefaultAPIClient: APIClient {
         guard let http = response as? HTTPURLResponse else { return }
         if (200..<300).contains(http.statusCode) { return }
         if http.statusCode == 401 {
-            // Ccierra sesión si el server responde 401
+            // Cierra sesión si el server responde 401
             SessionManager.shared.clear()
             throw AuthError.unauthorized
         }

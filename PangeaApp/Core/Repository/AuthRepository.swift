@@ -13,4 +13,6 @@ protocol AuthRepository {
     func register(username: String, email: String, password: String) async throws -> AuthSession
 
     func me(jwt: String) async throws -> AuthSession
+    
+    func forgotPassword(email: String) async throws
 }

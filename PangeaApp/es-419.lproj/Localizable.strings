@@ -53,6 +53,45 @@ settings.profile   = "Perfil de usuario";
 
 myesims.empty.title    = "Aún no tienes eSIMs";
 myesims.empty.subtitle = "Compra una eSIM para verla aquí";
+esim.coverage.unknown = "Cobertura desconocida";
+esim.expires = "Expira: %@";
+esim.not.activated = "Activa tu eSIM para disfrutar de sus beneficios";
+esim.status.ready = "No Instalada";
+esim.status.active = "Activo";
+esim.status.expired = "Expirado";
+esim.status.unknown = "Desconocido";
+title.esim.detail = "Detalles de eSIM";
+esim.detail.iccid = "ICCID";
+esim.detail.coverage = "Cobertura";
+esim.detail.expiration = "Fecha de Expiración";
+esim.detail.activation.code = "Código de Activación";
+esim.detail.lpa.code = "Código LPA";
+esim.detail.not.available = "No disponible";
+esim.button.activate = "Activar eSIM";
+esim.activate.confirm.title = "¿Activar eSIM?";
+esim.activate.confirm.message = "Esto activará tu eSIM. ¿Continuar?";
+esim.activate.success.title = "Éxito";
+esim.activate.success.message = "¡Tu eSIM se ha activado exitosamente!";
+// eSIM
+esim.days.left = "%d días restantes";
+esim.activated.on = "Activada el: %@";
+esim.expires.on = "Expira el: %@";
+esim.purchased.on = "Comprada el: %@";
+esim.check.usage = "Consulta tu uso aquí";
+esim.activate.cta = "Tu eSIM aún no está activa. Actívala e instálala aquí para disfrutar sus beneficios.";
+esim.quick.install = "Instalación rápida";
+esim.detail.activated = "Activada";
+esim.detail.purchased = "Comprada";
+esim.usage.data = "Datos";
+esim.usage.sms = "SMS";
+esim.usage.voice = "Voz";
+
+// Error
+error.title = "Error";
+error.packages.offline.title = "Sin Conexión";
+error.packages.offline.message = "No se pudieron cargar los paquetes. Verifica tu conexión a internet e intenta de nuevo.";
+error.esims.offline.title = "Sin Conexión";
+error.esims.offline.message = "No se pudieron cargar tus eSIMs. Verifica tu conexión a internet e intenta de nuevo.";
 
 /* Login */
 auth.login.title = "Iniciar sesión";
@@ -61,6 +100,11 @@ auth.password.placeholder = "Contraseña";
 auth.login.button = "Iniciar sesión";
 auth.register.cta = "Crear cuenta";
 app.logo = "Logo de la app";
+
+auth.login.subtitle = "Inicia sesión para continuar";
+auth.forgotPassword = "¿Olvidaste tu contraseña?";
+auth.register.prompt = "¿No tienes cuenta?";
+auth.register.link = "Registrarse";
 
 auth.register.title = "Crear cuenta";
 auth.name.placeholder = "Nombre de usuario";
@@ -74,6 +118,12 @@ auth.error.short_password = "La contraseña debe tener al menos %d caracteres.";
 auth.error.empty_name = "Ingresa tu nombre de usuario.";
 auth.error.short_name = "El nombre de usuario es demasiado corto.";
 auth.error.password_mismatch = "Las contraseñas no coinciden.";
+
+auth.forgot.title = "Recuperar contraseña";
+auth.forgot.subtitle = "Ingresa tu correo y te enviaremos un enlace";
+auth.forgot.button = "Enviar enlace";
+auth.forgot.success.title = "¡Correo enviado!";
+auth.forgot.success.message = "Revisa tu bandeja de entrada para el enlace de recuperación";
 
 auth.error.network = "No se pudo conectar con el servidor.";
 auth.error.unauthorized = "Sesión expirada. Inicia sesión de nuevo.";
@@ -89,3 +139,41 @@ settings.logout.confirm = "Cerrar sesión";
 common.cancel = "Cancelar";
 
 net.offline = "Sin conexión a Internet.";
+general.ok = "OK";
+general.retry = "Reintentar";
+general.cancel = "Cancelar";
+general.error = "Error";
+
+title.checkout = "Finalizar compra";
+checkout.title = "Revisa tu plan";
+checkout.subtitle = "Confirma los detalles de tu eSIM antes de pagar.";
+
+unit.days.long = "%d días";
+
+checkout.pay.button = "Pagar con tarjeta";
+
+checkout.data = "Datos";
+checkout.calls = "Llamadas";
+checkout.calls.included = "Incluye llamadas";
+checkout.sms = "SMS";
+checkout.sms.included = "Incluye SMS";
+checkout.extras = "Extras";
+checkout.coverage = "Cobertura";
+
+feature.data_roaming = "Roaming de datos";
+feature.usage_check = "Consulta de uso";
+
+checkout.status.preparing = "Preparando pago seguro...";
+checkout.status.ready = "Pago listo. Puedes pagar de forma segura.";
+checkout.status.success = "¡Pago realizado con éxito!";
+checkout.status.canceled = "Pago cancelado.";
+checkout.validity.info = "La vigencia inicia cuando activas la eSIM en la app, no cuando la compras.";
+checkout.secure.info = "Paga de forma segura con:";
+
+// Package info in eSIM detail
+package.data = "Datos";
+package.calls = "Llamadas";
+package.sms = "SMS";
+package.hotspot = "Hotspot";
+package.included = "Incluido";
+package.available = "Disponible";

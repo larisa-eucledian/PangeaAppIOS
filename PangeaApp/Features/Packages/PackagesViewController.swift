@@ -17,7 +17,7 @@ enum PackageFilter {
 private var didApplyInitialSnapshot = false
 
 
-final class PackagesViewController: UIViewController, UISearchResultsUpdating, UITableViewDelegate {
+final class PackagesViewController: UIViewController, UISearchResultsUpdating, UITableViewDelegate, UIScrollViewDelegate {
     enum Section: Hashable { case main }
 
     var repository: PlansRepository?
@@ -59,6 +59,10 @@ final class PackagesViewController: UIViewController, UISearchResultsUpdating, U
 
     required init?(coder: NSCoder) { super.init(coder: coder) }
 
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
         override func viewDidLoad() {
             super.viewDidLoad()
             setNavBarLogo()
@@ -71,6 +75,14 @@ final class PackagesViewController: UIViewController, UISearchResultsUpdating, U
 
             title = NSLocalizedString("title.packages", comment: "")
             view.backgroundColor = .systemBackground
+
+            // Listen for cache updates (when fresh data arrives from network)
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(handleDataUpdated),
+                name: .packagesDataUpdated,
+                object: nil
+            )
 
             // Search en la NavBar
             navigationController?.navigationBar.prefersLargeTitles = true
@@ -135,10 +147,43 @@ final class PackagesViewController: UIViewController, UISearchResultsUpdating, U
                        self.applyFilter()
                    }
                } catch {
-                   print("packages error:", error) // TODO: mostrar alerta localizada
+                   print("packages error:", error)
+                   await MainActor.run {
+                       self.showOfflineError()
+                   }
                }
            }
        }
+
+    private func showOfflineError() {
+        let alert = UIAlertController(
+            title: NSLocalizedString("error.packages.offline.title", comment: ""),
+            message: NSLocalizedString("error.packages.offline.message", comment: ""),
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(
+            title: NSLocalizedString("general.retry", comment: ""),
+            style: .default,
+            handler: { [weak self] _ in
+                self?.load()
+            }
+        ))
+        alert.addAction(UIAlertAction(
+            title: NSLocalizedString("general.cancel", comment: ""),
+            style: .cancel
+        ))
+        present(alert, animated: true)
+    }
+
+    @objc private func handleDataUpdated(_ notification: Notification) {
+        // Fresh data arrived from network in background
+        print("🔔 Packages data updated notification received")
+        if let data = notification.object as? (countryName: String, packages: [PackageRow]),
+           data.countryName == self.countryName {
+            self.all = data.packages
+            self.applyFilter()
+        }
+    }
 
     // MARK: - UISearchResultsUpdating
     func updateSearchResults(for searchController: UISearchController) {
@@ -150,9 +195,32 @@ final class PackagesViewController: UIViewController, UISearchResultsUpdating, U
 
     private func applyFilter() {
         var result = all
-        
+
         if !query.isEmpty {
-            result = result.filter { $0.package.localizedCaseInsensitiveContains(query) }
+            result = result.filter { pkg in
+                // Search in package name
+                if pkg.package.localizedCaseInsensitiveContains(query) {
+                    return true
+                }
+
+                // Search in coverage (country codes and country names)
+                if let coverage = pkg.coverage {
+                    for countryCode in coverage {
+                        // Match country code (e.g., "MX")
+                        if countryCode.localizedCaseInsensitiveContains(query) {
+                            return true
+                        }
+
+                        // Match country name (e.g., "México", "Mexico")
+                        let countryName = self.countryName(for: countryCode)
+                        if countryName.localizedCaseInsensitiveContains(query) {
+                            return true
+                        }
+                    }
+                }
+
+                return false
+            }
         }
         
         switch currentFilter {
@@ -188,8 +256,23 @@ final class PackagesViewController: UIViewController, UISearchResultsUpdating, U
      // MARK: - UITableViewDelegate
      func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
          defer { tableView.deselectRow(at: indexPath, animated: true) }
-         if let pkg = ds.itemIdentifier(for: indexPath) {
-             print("Seleccionaste paquete:", pkg.package_id) //TODO: Flujo de compra de paquete. Agregar al carrito?
-         }
+
+             if let pkg = ds.itemIdentifier(for: indexPath) {
+                 // Flujo de compra del paquete → Checkout
+                 let checkoutVC = CheckoutViewController(package: pkg, countryName: countryName)
+                 navigationController?.pushViewController(checkoutVC, animated: true)
+             }
      }
+
+    // MARK: - UIScrollViewDelegate
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        navigationItem.searchController?.searchBar.resignFirstResponder()
+    }
+
+    // MARK: - Helpers
+    private func countryName(for countryCode: String) -> String {
+        let code = countryCode.uppercased()
+        let locale = Locale.current
+        return locale.localizedString(forRegionCode: code) ?? code
+    }
  }

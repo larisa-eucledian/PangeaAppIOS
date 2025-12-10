@@ -9,382 +9,435 @@ import UIKit
 
 final class LoginViewController: UIViewController {
 
-    // MARK: - UI
-    private let scroll = UIScrollView()
-    private let content = UIStackView()
-
-    private let logoImageView = UIImageView(image: UIImage(named: "AppLogo"))
-    private let titleLabel = UILabel()
-    private let emailField = UITextField()
-    private let passwordField = UITextField()
-    private let errorLabel = UILabel()
-    private let loginButton = UIButton(type: .system)
-    private let activity = UIActivityIndicatorView(style: .medium)
+    // MARK: - UI Components
+    private let scrollView = UIScrollView()
+    private let contentView = UIView()
+    
+    private let logoImageView: UIImageView = {
+        let iv = UIImageView(image: UIImage(named: "AppLogo"))
+        iv.contentMode = .scaleAspectFit
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        return iv
+    }()
+    
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.text = NSLocalizedString("auth.login.title", value: "Welcome to Pangea", comment: "")
+        label.font = .systemFont(ofSize: 24, weight: .bold)
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let subtitleLabel: UILabel = {
+        let label = UILabel()
+        label.text = NSLocalizedString("auth.login.subtitle", value: "Sign in to continue", comment: "")
+        label.font = .systemFont(ofSize: 14, weight: .regular)
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private lazy var emailField: OutlinedTextField = {
+        let field = OutlinedTextField(placeholder: NSLocalizedString("auth.email.placeholder", value: "Email or username", comment: ""))
+        field.keyboardType = .emailAddress
+        field.textContentType = .username
+        field.autocapitalizationType = .none
+        field.translatesAutoresizingMaskIntoConstraints = false
+        return field
+    }()
+    
+    private lazy var passwordField: OutlinedTextField = {
+        let field = OutlinedTextField(placeholder: NSLocalizedString("auth.password.placeholder", value: "Password", comment: ""))
+        field.isSecureTextEntry = true
+        field.textContentType = .password
+        field.autocapitalizationType = .none
+        field.translatesAutoresizingMaskIntoConstraints = false
+        return field
+    }()
+    
+    private let forgotPasswordButton: UIButton = {
+        let btn = UIButton(type: .system)
+        btn.setTitle(NSLocalizedString("auth.forgotPassword", value: "Forgot password?", comment: ""), for: .normal)
+        btn.titleLabel?.font = .systemFont(ofSize: 14, weight: .regular)
+        btn.contentHorizontalAlignment = .trailing
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        return btn
+    }()
+    
+    private let loginButton: UIButton = {
+        let btn = UIButton(type: .system)
+        btn.setTitle(NSLocalizedString("auth.login.button", value: "Login", comment: ""), for: .normal)
+        btn.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
+        btn.layer.cornerRadius = 12
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        return btn
+    }()
+    
+    private let loadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .medium)
+        indicator.hidesWhenStopped = true
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        return indicator
+    }()
+    
+    private let dividerView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    private let registerContainerView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    private let registerPromptLabel: UILabel = {
+        let label = UILabel()
+        label.text = NSLocalizedString("auth.register.prompt", value: "Don't have an account?", comment: "")
+        label.font = .systemFont(ofSize: 14, weight: .regular)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let registerButton: UIButton = {
+        let btn = UIButton(type: .system)
+        btn.setTitle(NSLocalizedString("auth.register.link", value: "Register", comment: ""), for: .normal)
+        btn.titleLabel?.font = .systemFont(ofSize: 14, weight: .bold)
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        return btn
+    }()
+    
+    // MARK: - State
+    private var touchedEmail = false
+    private var touchedPassword = false
 
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        buildUI()
+        setupUI()
         applyTheme()
-        wireEvents()
-        validateForm()
+        setupActions()
+        setupPasswordToggle()
     }
 
-    // MARK: - Build
-    private func buildUI() {
+    // MARK: - Setup UI
+    private func setupUI() {
         view.backgroundColor = AppColor.background
-
-        // Scroll + content
-        view.addSubview(scroll)
-        scroll.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            scroll.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            scroll.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            scroll.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            scroll.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
-
-        scroll.addSubview(content)
-        content.axis = .vertical
-        content.alignment = .fill
-        content.spacing = 16
-        content.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            content.topAnchor.constraint(equalTo: scroll.contentLayoutGuide.topAnchor, constant: 32),
-            content.leadingAnchor.constraint(equalTo: scroll.frameLayoutGuide.leadingAnchor, constant: 20),
-            content.trailingAnchor.constraint(equalTo: scroll.frameLayoutGuide.trailingAnchor, constant: -20),
-            content.bottomAnchor.constraint(equalTo: scroll.contentLayoutGuide.bottomAnchor, constant: -24)
-        ])
-
-        // Logo
-        logoImageView.contentMode = .scaleAspectFit
-        logoImageView.setContentHuggingPriority(.required, for: .vertical)
-        logoImageView.isAccessibilityElement = true
-        logoImageView.accessibilityLabel = NSLocalizedString("app.logo", comment: "")
-        content.addArrangedSubview(logoImageView)
-        logoImageView.heightAnchor.constraint(equalToConstant: 96).isActive = true
-
-        // Título
-        titleLabel.text = NSLocalizedString("auth.login.title", comment: "Iniciar sesión")
-        titleLabel.font = UIFont.preferredFont(forTextStyle: .title2)
-        titleLabel.adjustsFontForContentSizeCategory = true
-        content.addArrangedSubview(titleLabel)
-
-        // Campos
-        styleTextField(emailField,
-                       placeholder: NSLocalizedString("auth.email.placeholder", comment: "Correo electrónico"),
-                       contentType: .username,
-                       keyboard: .emailAddress,
-                       isSecure: false)
-
-        styleTextField(passwordField,
-                       placeholder: NSLocalizedString("auth.password.placeholder", comment: "Contraseña"),
-                       contentType: .password,
-                       keyboard: .default,
-                       isSecure: true)
-
-        content.addArrangedSubview(emailField)
-        content.addArrangedSubview(passwordField)
-
-        emailField.heightAnchor.constraint(equalToConstant: 48).isActive = true
-        passwordField.heightAnchor.constraint(equalToConstant: 48).isActive = true
-
-        // Error
-        errorLabel.font = UIFont.preferredFont(forTextStyle: .footnote)
-        errorLabel.adjustsFontForContentSizeCategory = true
-        errorLabel.numberOfLines = 0
-        errorLabel.isHidden = true
-        content.addArrangedSubview(errorLabel)
-
-        // Botón + activity
-        let btnContainer = UIView()
-        btnContainer.translatesAutoresizingMaskIntoConstraints = false
-        btnContainer.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        content.addArrangedSubview(btnContainer)
-
-        loginButton.setTitle(NSLocalizedString("auth.login.button", comment: "Iniciar sesión"), for: .normal)
-        loginButton.layer.cornerRadius = 12
-        loginButton.layer.masksToBounds = true
-        loginButton.translatesAutoresizingMaskIntoConstraints = false
-
-        activity.hidesWhenStopped = true
-        activity.translatesAutoresizingMaskIntoConstraints = false
-
-        btnContainer.addSubview(loginButton)
-        btnContainer.addSubview(activity)
-
-        NSLayoutConstraint.activate([
-            loginButton.leadingAnchor.constraint(equalTo: btnContainer.leadingAnchor),
-            loginButton.trailingAnchor.constraint(equalTo: btnContainer.trailingAnchor),
-            loginButton.topAnchor.constraint(equalTo: btnContainer.topAnchor),
-            loginButton.bottomAnchor.constraint(equalTo: btnContainer.bottomAnchor),
-
-            activity.centerYAnchor.constraint(equalTo: loginButton.centerYAnchor),
-            activity.trailingAnchor.constraint(equalTo: loginButton.trailingAnchor, constant: -16)
-        ])
-        createAccountButton.setTitle(NSLocalizedString("auth.register.cta", comment: "Crear cuenta"), for: .normal)
-        createAccountButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
-        createAccountButton.titleLabel?.adjustsFontForContentSizeCategory = true
-        content.addArrangedSubview(createAccountButton)
         
-        attachPasswordToggle(to: passwordField)
-
-    }
-
-    private func styleTextField(_ tf: UITextField,
-                                placeholder: String,
-                                contentType: UITextContentType,
-                                keyboard: UIKeyboardType,
-                                isSecure: Bool) {
-        tf.autocapitalizationType = .none
-        tf.autocorrectionType = .no
-        tf.textContentType = contentType
-        tf.keyboardType = keyboard
-        tf.isSecureTextEntry = isSecure
-        tf.clearButtonMode = .whileEditing
-        tf.borderStyle = .none
-        tf.layer.cornerRadius = 12
-        tf.layer.masksToBounds = true
-        tf.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: 1))
-        tf.leftViewMode = .always
-        tf.heightAnchor.constraint(greaterThanOrEqualToConstant: 44).isActive = true
-        tf.font = UIFont.preferredFont(forTextStyle: .body)
-        tf.adjustsFontForContentSizeCategory = true
-
-        tf.attributedPlaceholder = NSAttributedString(
-            string: placeholder,
-            attributes: [.foregroundColor: AppColor.textMuted]
-        )
+        // ScrollView
+        view.addSubview(scrollView)
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.keyboardDismissMode = .interactive
+        
+        // Content view
+        scrollView.addSubview(contentView)
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Add subviews
+        contentView.addSubview(logoImageView)
+        contentView.addSubview(titleLabel)
+        contentView.addSubview(subtitleLabel)
+        contentView.addSubview(emailField)
+        contentView.addSubview(passwordField)
+        contentView.addSubview(forgotPasswordButton)
+        contentView.addSubview(loginButton)
+        contentView.addSubview(loadingIndicator)
+        contentView.addSubview(dividerView)
+        contentView.addSubview(registerContainerView)
+        
+        registerContainerView.addSubview(registerPromptLabel)
+        registerContainerView.addSubview(registerButton)
+        
+        // Layout constraints
+        NSLayoutConstraint.activate([
+            // ScrollView
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            // Content view
+            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+            
+            // Logo - 48dp top margin
+            logoImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 48),
+            logoImageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            logoImageView.widthAnchor.constraint(equalToConstant: 180),
+            logoImageView.heightAnchor.constraint(equalToConstant: 180),
+            
+            // Title - 24dp margin from logo
+            titleLabel.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: 24),
+            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
+            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24),
+            
+            // Subtitle - 8dp margin from title
+            subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
+            subtitleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
+            subtitleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24),
+            
+            // Email field - 32dp margin from subtitle
+            emailField.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 32),
+            emailField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
+            emailField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24),
+            
+            // Password field - 16dp margin from email
+            passwordField.topAnchor.constraint(equalTo: emailField.bottomAnchor, constant: 16),
+            passwordField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
+            passwordField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24),
+            
+            // Forgot password - 8dp margin from password
+            forgotPasswordButton.topAnchor.constraint(equalTo: passwordField.bottomAnchor, constant: 8),
+            forgotPasswordButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24),
+            forgotPasswordButton.heightAnchor.constraint(equalToConstant: 32),
+            
+            // Login button - 24dp margin from forgot password
+            loginButton.topAnchor.constraint(equalTo: forgotPasswordButton.bottomAnchor, constant: 24),
+            loginButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
+            loginButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24),
+            loginButton.heightAnchor.constraint(equalToConstant: 56),
+            
+            // Loading indicator
+            loadingIndicator.centerXAnchor.constraint(equalTo: loginButton.centerXAnchor),
+            loadingIndicator.centerYAnchor.constraint(equalTo: loginButton.centerYAnchor),
+            
+            // Divider - 32dp margin from login button
+            dividerView.topAnchor.constraint(equalTo: loginButton.bottomAnchor, constant: 32),
+            dividerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
+            dividerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24),
+            dividerView.heightAnchor.constraint(equalToConstant: 1),
+            
+            // Register container - 24dp margin from divider
+            registerContainerView.topAnchor.constraint(equalTo: dividerView.bottomAnchor, constant: 24),
+            registerContainerView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            registerContainerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -24),
+            
+            // Register prompt and button
+            registerPromptLabel.leadingAnchor.constraint(equalTo: registerContainerView.leadingAnchor),
+            registerPromptLabel.topAnchor.constraint(equalTo: registerContainerView.topAnchor),
+            registerPromptLabel.bottomAnchor.constraint(equalTo: registerContainerView.bottomAnchor),
+            
+            registerButton.leadingAnchor.constraint(equalTo: registerPromptLabel.trailingAnchor, constant: 4),
+            registerButton.trailingAnchor.constraint(equalTo: registerContainerView.trailingAnchor),
+            registerButton.topAnchor.constraint(equalTo: registerContainerView.topAnchor),
+            registerButton.bottomAnchor.constraint(equalTo: registerContainerView.bottomAnchor)
+        ])
     }
 
     // MARK: - Theme
     private func applyTheme() {
-        view.backgroundColor = AppColor.background
         titleLabel.textColor = AppColor.textPrimary
-
-        [emailField, passwordField].forEach {
-            $0.backgroundColor = AppColor.backgroundSecondary
-            $0.textColor = AppColor.textPrimary
-            $0.layer.borderWidth = 1
-            $0.layer.borderColor = AppColor.border.cgColor
-            $0.tintColor = AppColor.primary
-        }
-
-        errorLabel.textColor = .systemRed
-
+        subtitleLabel.textColor = AppColor.textMuted
+        forgotPasswordButton.setTitleColor(AppColor.primary, for: .normal)
         loginButton.backgroundColor = AppColor.primary
-        loginButton.setTitleColor(AppColor.textPrimary, for: .normal)
-        loginButton.tintColor = AppColor.background
+        loginButton.setTitleColor(.white, for: .normal)
+        dividerView.backgroundColor = AppColor.border
+        registerPromptLabel.textColor = AppColor.textMuted
+        registerButton.setTitleColor(AppColor.primary, for: .normal)
+        loadingIndicator.color = .white
+    }
+
+    // MARK: - Actions
+    private func setupActions() {
+        emailField.onTextChange { [weak self] _ in
+            self?.touchedEmail = true
+            self?.validateForm()
+        }
         
-        createAccountButton.setTitleColor(AppColor.primary, for: .normal)
-        createAccountButton.tintColor = AppColor.primary
-
+        passwordField.onTextChange { [weak self] _ in
+            self?.touchedPassword = true
+            self?.validateForm()
+        }
+        
+        emailField.onEditingEnd { [weak self] in
+            self?.touchedEmail = true
+            self?.validateEmailField()
+        }
+        
+        passwordField.onEditingEnd { [weak self] in
+            self?.touchedPassword = true
+            self?.validatePasswordField()
+        }
+        
+        loginButton.addTarget(self, action: #selector(onLoginTap), for: .touchUpInside)
+        forgotPasswordButton.addTarget(self, action: #selector(onForgotPasswordTap), for: .touchUpInside)
+        registerButton.addTarget(self, action: #selector(onRegisterTap), for: .touchUpInside)
     }
-
-    // MARK: - Events / Logic
-    private func wireEvents() {
-        emailField.addTarget(self, action: #selector(onTextChanged), for: .editingChanged)
-        passwordField.addTarget(self, action: #selector(onTextChanged), for: .editingChanged)
-        loginButton.addTarget(self, action: #selector(onTapLogin), for: .touchUpInside)
-        createAccountButton.addTarget(self, action: #selector(onTapShowRegister), for: .touchUpInside)
-        emailField.addTarget(self, action: #selector(onTextChanged), for: .editingChanged)
-        passwordField.addTarget(self, action: #selector(onTextChanged), for: .editingChanged)
-
-        emailField.addTarget(self, action: #selector(onEditingDidEnd(_:)), for: .editingDidEnd)
-        passwordField.addTarget(self, action: #selector(onEditingDidEnd(_:)), for: .editingDidEnd)
-
-
+    
+    private func setupPasswordToggle() {
+        let toggleButton = UIButton(type: .system)
+        toggleButton.setImage(UIImage(systemName: "eye.slash.fill"), for: .normal)
+        toggleButton.tintColor = AppColor.textMuted
+        toggleButton.frame = CGRect(x: 0, y: 0, width: 44, height: 44)
+        toggleButton.addTarget(self, action: #selector(togglePasswordVisibility), for: .touchUpInside)
+        passwordField.rightView = toggleButton
     }
-
-    @objc private func onTextChanged() {
-        if !(emailField.text ?? "").isEmpty { touchedEmail = true }
-        if !(passwordField.text ?? "").isEmpty { touchedPass = true }
-        updateValidationUI()
+    
+    @objc private func togglePasswordVisibility(_ sender: UIButton) {
+        passwordField.isSecureTextEntry.toggle()
+        let imageName = passwordField.isSecureTextEntry ? "eye.slash.fill" : "eye.fill"
+        sender.setImage(UIImage(systemName: imageName), for: .normal)
     }
-
-    @objc private func onEditingDidEnd(_ tf: UITextField) {
-        if tf === emailField { touchedEmail = true }
-        if tf === passwordField { touchedPass = true }
-        updateValidationUI()
+    
+    @objc private func onLoginTap() {
+        view.endEditing(true)
+        
+        emailField.clearError()
+        passwordField.clearError()
+        
+        guard validateAllFields() else { return }
+        
+        performLogin()
     }
-
-    private func updateValidationUI() {
+    
+    @objc private func onForgotPasswordTap() {
+        let forgotVC = ForgotPasswordViewController()
+        forgotVC.title = NSLocalizedString("auth.forgot.title", value: "Forgot Password", comment: "")
+        forgotVC.navigationItem.leftBarButtonItem = UIBarButtonItem(
+            barButtonSystemItem: .close,
+            target: self,
+            action: #selector(dismissModal)
+        )
+        let nav = UINavigationController(rootViewController: forgotVC)
+        nav.modalPresentationStyle = .pageSheet
+        if let sheet = nav.sheetPresentationController {
+            sheet.detents = [.medium()]
+        }
+        present(nav, animated: true)
+    }
+    
+    @objc private func onRegisterTap() {
+        let registerVC = RegisterViewController()
+        registerVC.title = NSLocalizedString("auth.register.title", value: "Create Account", comment: "")
+        registerVC.navigationItem.leftBarButtonItem = UIBarButtonItem(
+            barButtonSystemItem: .close,
+            target: self,
+            action: #selector(dismissModal)
+        )
+        let nav = UINavigationController(rootViewController: registerVC)
+        nav.modalPresentationStyle = .fullScreen
+        present(nav, animated: true)
+    }
+    
+    @objc private func dismissModal() {
+        dismiss(animated: true)
+    }
+    
+    // MARK: - Validation
+    private func validateForm() {
+        let email = emailField.text ?? ""
+        let password = passwordField.text ?? ""
+        
+        let isValid = isValidEmail(email) && password.count >= 8
+        loginButton.isEnabled = isValid
+        loginButton.alpha = isValid ? 1.0 : 0.5
+    }
+    
+    private func validateEmailField() {
+        guard touchedEmail else { return }
         let email = (emailField.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-        let pass  = passwordField.text ?? ""
-
-        let emailOK = isValidEmail(email)
-        let passOK  = pass.count >= 8
-
-        loginButton.isEnabled = emailOK && passOK
-        loginButton.alpha = loginButton.isEnabled ? 1.0 : 0.5
-
-        clearInvalid([emailField, passwordField])
-        errorLabel.isHidden = true
-
-        // Mostrar errores inmediatos (solo si el campo fue “tocado” y hay valor)
-        if touchedEmail && !email.isEmpty && !emailOK {
-            markInvalid([emailField])
-            showInlineError(NSLocalizedString("auth.error.invalid_email", comment: ""))
-        } else if touchedPass && !pass.isEmpty && !passOK {
-            markInvalid([passwordField])
-            let msg = String(format: NSLocalizedString("auth.error.short_password", comment: ""), 8)
-            showInlineError(msg)
+        
+        if email.isEmpty {
+            emailField.setError(NSLocalizedString("auth.error.empty_email", value: "Email is required", comment: ""))
+        } else if !isValidEmail(email) {
+            emailField.setError(NSLocalizedString("auth.error.invalid_email", value: "Invalid email address", comment: ""))
+        } else {
+            emailField.clearError()
         }
     }
-
-
-    private func validateForm() {
-        let emailOK = isValidEmail(emailField.text ?? "")
-        let passOK  = (passwordField.text ?? "").count >= 8
-        loginButton.isEnabled = emailOK && passOK
-        loginButton.alpha = loginButton.isEnabled ? 1.0 : 0.5
-    }
-
-    @objc private func onTapLogin() {
-        view.endEditing(true)
-        setLoading(true)
-        errorLabel.isHidden = true
-        clearInvalid([emailField, passwordField])
+    
+    private func validatePasswordField() {
+        guard touchedPassword else { return }
+        let password = passwordField.text ?? ""
         
-        if let msg = validationErrorLogin() {
- 
-                var bad: [UITextField] = []
-                if msg == NSLocalizedString("auth.error.empty_email", comment: "") ||
-                   msg == NSLocalizedString("auth.error.invalid_email", comment: "") { bad.append(emailField) }
-                if msg == NSLocalizedString("auth.error.empty_password", comment: "") ||
-                   msg.contains("8") { bad.append(passwordField) }
-
-                markInvalid(bad)
-                showInlineError(msg)
-                return
-            }
-
+        if password.isEmpty {
+            passwordField.setError(NSLocalizedString("auth.error.empty_password", value: "Password is required", comment: ""))
+        } else if password.count < 8 {
+            let message = String(format: NSLocalizedString("auth.error.short_password", value: "Password must be at least %d characters", comment: ""), 8)
+            passwordField.setError(message)
+        } else {
+            passwordField.clearError()
+        }
+    }
+    
+    private func validateAllFields() -> Bool {
+        let email = (emailField.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        let password = passwordField.text ?? ""
+        
+        var isValid = true
+        
+        if email.isEmpty {
+            emailField.setError(NSLocalizedString("auth.error.empty_email", value: "Email is required", comment: ""))
+            isValid = false
+        } else if !isValidEmail(email) {
+            emailField.setError(NSLocalizedString("auth.error.invalid_email", value: "Invalid email address", comment: ""))
+            isValid = false
+        }
+        
+        if password.isEmpty {
+            passwordField.setError(NSLocalizedString("auth.error.empty_password", value: "Password is required", comment: ""))
+            isValid = false
+        } else if password.count < 8 {
+            let message = String(format: NSLocalizedString("auth.error.short_password", value: "Password must be at least %d characters", comment: ""), 8)
+            passwordField.setError(message)
+            isValid = false
+        }
+        
+        return isValid
+    }
+    
+    private func isValidEmail(_ email: String) -> Bool {
+        let regex = #"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$"#
+        return email.range(of: regex, options: [.regularExpression, .caseInsensitive]) != nil
+    }
+    
+    // MARK: - Network
+    private func performLogin() {
+        setLoading(true)
+        
         let identifier = emailField.text ?? ""
         let password = passwordField.text ?? ""
-
-        Task { [weak self] in
-            guard let self = self else { return }
+        
+        Task {
             do {
                 let session = try await AppDependencies.shared.authRepository
                     .login(identifier: identifier, password: password)
                 SessionManager.shared.save(session: session)
-               
+                // Navigation handled by SceneDelegate observer
             } catch {
-                showError(error)
+                await MainActor.run {
+                    self.handleLoginError(error)
+                    self.setLoading(false)
+                }
             }
-            setLoading(true)
         }
     }
-
-    private func setLoading(_ loading: Bool) {
-        loginButton.isEnabled = !loading
-        loginButton.alpha = loginButton.isEnabled ? 1.0 : 0.6
-        loading ? activity.startAnimating() : activity.stopAnimating()
-    }
-
-    private func showError(_ error: Error) {
-        errorLabel.text = (error as NSError).localizedDescription
-        errorLabel.isHidden = false
-    }
-
-    private func isValidEmail(_ s: String) -> Bool {
-        let regex = #"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$"#
-        return s.range(of: regex, options: [.regularExpression, .caseInsensitive]) != nil
-    }
     
-    private let createAccountButton = UIButton(type: .system)
-    
-    @objc private func onTapShowRegister() {
-        let reg = RegisterViewController()
-        reg.title = NSLocalizedString("auth.register.title", comment: "")
-        reg.navigationItem.leftBarButtonItem = UIBarButtonItem(
-            barButtonSystemItem: .close,
-            target: self,
-            action: #selector(dismissRegister)
-        )
-        let nav = UINavigationController(rootViewController: reg)
-        nav.modalPresentationStyle = .fullScreen
-        present(nav, animated: true)
-    }
-
-    @objc private func dismissRegister() {
-        dismiss(animated: true)
-    }
-
-    
-    private func showInlineError(_ message: String) {
-        errorLabel.text = message
-        errorLabel.isHidden = false
-        UIAccessibility.post(notification: .announcement, argument: message)
+    private func handleLoginError(_ error: Error) {
+        let errorMessage = (error as NSError).localizedDescription
+        
+        // Show error on password field (common UX pattern)
+        passwordField.setError(errorMessage)
+        
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
     }
-
-    private func markInvalid(_ fields: [UITextField]) {
-        fields.forEach {
-            $0.layer.borderColor = UIColor.systemRed.cgColor
-            $0.layer.borderWidth = 1
+    
+    private func setLoading(_ loading: Bool) {
+        loginButton.isEnabled = !loading
+        emailField.isEnabled = !loading
+        passwordField.isEnabled = !loading
+        
+        if loading {
+            loadingIndicator.startAnimating()
+            loginButton.setTitle("", for: .normal)
+        } else {
+            loadingIndicator.stopAnimating()
+            loginButton.setTitle(NSLocalizedString("auth.login.button", value: "Login", comment: ""), for: .normal)
         }
     }
-
-    private func clearInvalid(_ fields: [UITextField]) {
-        fields.forEach {
-            $0.layer.borderColor = AppColor.border.cgColor
-            $0.layer.borderWidth = 1
-        }
-    }
-    
-    private var touchedEmail = false
-    private var touchedPass  = false
-
-    
-    
-    private func validationErrorLogin() -> String? {
-        let email = (emailField.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-        let pass  = passwordField.text ?? ""
-
-        if email.isEmpty { return NSLocalizedString("auth.error.empty_email", comment: "") }
-        if !isValidEmail(email) { return NSLocalizedString("auth.error.invalid_email", comment: "") }
-        if pass.isEmpty { return NSLocalizedString("auth.error.empty_password", comment: "") }
-        if pass.count < 8 {
-            return String(format: NSLocalizedString("auth.error.short_password", comment: ""), 8)
-        }
-        return nil
-    }
-
-    private func attachPasswordToggle(to tf: UITextField) {
-        let btn = UIButton(type: .system)
-        btn.setImage(UIImage(systemName: "eye.slash"), for: .normal)
-        btn.tintColor = AppColor.textMuted
-        btn.frame = CGRect(x: 0, y: 0, width: 44, height: 44)
-        btn.addTarget(self, action: #selector(togglePasswordVisibility(_:)), for: .touchUpInside)
-        tf.rightView = btn
-        tf.rightViewMode = .always
-    }
-
-    @objc private func togglePasswordVisibility(_ sender: UIButton) {
-        // Soporta uno o varios campos con ojito
-        let fields: [UITextField] = [passwordField]
-        guard let tf = fields.first(where: { $0.rightView === sender }) else { return }
-
-        tf.isSecureTextEntry.toggle()
-        sender.setImage(UIImage(systemName: tf.isSecureTextEntry ? "eye.slash" : "eye"), for: .normal)
-
-        // Truco para mantener el cursor visible al cambiar isSecureTextEntry
-        let txt = tf.text
-        tf.text = nil
-        tf.text = txt
-    }
-
-
 }
-
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */

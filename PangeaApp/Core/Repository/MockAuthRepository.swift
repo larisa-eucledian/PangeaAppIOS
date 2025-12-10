@@ -133,4 +133,9 @@ final class MockAuthRepository: AuthRepository {
         let digest = Insecure.SHA1.hash(data: Data(value.utf8))
         return digest.map { String(format: "%02hhx", $0) }.joined()
     }
+    
+    func forgotPassword(email: String) async throws {
+        // Mock: no hace nada, solo simula éxito
+        try await Task.sleep(nanoseconds: 500_000_000) // 0.5 segundos
+    }
 }

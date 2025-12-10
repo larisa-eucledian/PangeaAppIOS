@@ -8,6 +8,7 @@
 protocol PlansRepository {
     func fetchCountries(geography: Geography?, search: String?) async throws -> [CountryRow]
     func fetchPackages(countryName: String) async throws -> [PackageRow]
+    func fetchPackage(packageId: String) async throws -> PackageRow?
 }
 
 

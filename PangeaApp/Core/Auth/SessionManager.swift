@@ -13,6 +13,7 @@ final class SessionManager {
 
     private let jwtKey = "auth.jwt"
     private let expKey = "auth.exp" // ISO8601 string
+    private let userKey = "auth.user" // JSON serialized AuthUser
 
     private(set) var session: AuthSession? = nil
 
@@ -30,13 +31,25 @@ final class SessionManager {
             let jwt = try KeychainService.read(account: jwtKey).flatMap { String(data: $0, encoding: .utf8) } ?? ""
             let expStr = try KeychainService.read(account: expKey).flatMap { String(data: $0, encoding: .utf8) }
             let exp = expStr.flatMap { iso.date(from: $0) }
-            if !jwt.isEmpty {
 
-                self.session = AuthSession(jwt: jwt, user: AuthUser(id: -1, username: "", email: "", confirmed: nil, blocked: nil), expiresAt: exp)
+            if !jwt.isEmpty {
+                // Load user data from keychain
+                print("🔐 SessionManager: Loading user data from keychain")
+                if let userData = try? KeychainService.read(account: userKey),
+                   let user = try? JSONDecoder().decode(AuthUser.self, from: userData) {
+                    print("✅ SessionManager: User data loaded - email: \(user.email), username: \(user.username)")
+                    self.session = AuthSession(jwt: jwt, user: user, expiresAt: exp)
+                } else {
+                    print("⚠️ SessionManager: No user data found in keychain, using placeholder")
+                    // Fallback: create placeholder user if user data not found
+                    self.session = AuthSession(jwt: jwt, user: AuthUser(id: -1, username: "", email: "", confirmed: nil, blocked: nil), expiresAt: exp)
+                }
             } else {
+                print("⚠️ SessionManager: No JWT found")
                 self.session = nil
             }
         } catch {
+            print("❌ SessionManager: Error loading from keychain - \(error)")
             self.session = nil
         }
         NotificationCenter.default.post(name: Self.sessionDidChange, object: nil)
@@ -45,6 +58,16 @@ final class SessionManager {
     func save(session: AuthSession) {
         do {
             try KeychainService.save(Data(session.jwt.utf8), account: jwtKey)
+
+            // Save user data
+            print("🔐 SessionManager: Saving user data - email: \(session.user.email), username: \(session.user.username)")
+            if let userData = try? JSONEncoder().encode(session.user) {
+                try KeychainService.save(userData, account: userKey)
+                print("✅ SessionManager: User data saved successfully")
+            } else {
+                print("❌ SessionManager: Failed to encode user data")
+            }
+
             if let exp = session.expiresAt {
                 try KeychainService.save(Data(ISO8601DateFormatter().string(from: exp).utf8), account: expKey)
             } else {
@@ -53,6 +76,7 @@ final class SessionManager {
             self.session = session
             NotificationCenter.default.post(name: Self.sessionDidChange, object: nil)
         } catch {
+            print("❌ SessionManager: Error saving session - \(error)")
             clear()
         }
     }
@@ -60,6 +84,7 @@ final class SessionManager {
     func clear() {
         KeychainService.delete(account: jwtKey)
         KeychainService.delete(account: expKey)
+        KeychainService.delete(account: userKey)
         session = nil
         NotificationCenter.default.post(name: Self.sessionDidChange, object: nil)
     }

@@ -12,14 +12,14 @@ final class OfflineBannerView: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = .systemRed.withAlphaComponent(0.12)
+        backgroundColor = .systemRed.withAlphaComponent(0.9)
         layer.cornerRadius = 10
         layer.masksToBounds = true
 
         label.text = NSLocalizedString("net.offline", comment: "Sin conexión a Internet.")
-        label.font = UIFont.preferredFont(forTextStyle: .footnote)
+        label.font = UIFont.systemFont(ofSize: 13, weight: .semibold)
         label.adjustsFontForContentSizeCategory = true
-        label.textColor = .systemRed
+        label.textColor = .white
         label.textAlignment = .center
 
         label.translatesAutoresizingMaskIntoConstraints = false

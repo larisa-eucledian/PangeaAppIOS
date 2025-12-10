@@ -7,7 +7,6 @@
 
 import Foundation
 enum Config {
-    static let baseURL = URL(string: "https://e950737f306e.ngrok-free.app/api")!
-    static let jwtDev = "<JWT_DEV>"              //requests con token? (AuthManager)
-    static let tenantKeyDev = "<TENANT_KEY_DEV>"
+    static let baseURL = URL(string: "https://stage.pangeamovil.com/api")!
+    static let tenantAPIKey = "pga_pangeaapp_123"
 }

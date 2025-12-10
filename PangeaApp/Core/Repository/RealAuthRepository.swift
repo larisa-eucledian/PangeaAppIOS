@@ -7,6 +7,10 @@
 
 import Foundation
 
+private struct ForgotPasswordResponseDTO: Decodable {
+    let ok: Bool
+}
+
 final class RealAuthRepository: AuthRepository {
     private let api: APIClient
     private enum Path {
@@ -29,12 +33,17 @@ final class RealAuthRepository: AuthRepository {
         return AuthSession(jwt: res.jwt, user: res.user, expiresAt: .distantFuture)
     }
     func me(jwt: String) async throws -> AuthSession {
-        // No existe /users/me en tu backend.
-        // Stub seguro: si hay sesión local, la devolvemos; si no, 401 controlado.
         if let s = SessionManager.shared.session {
             return s
         }
         throw AuthError.unauthorized
+    }
+    
+    func forgotPassword(email: String) async throws {
+        let body = ["email": email]
+        let req = APIRequest(method: .POST, path: "auth/forgot-password", jsonBody: body)
+        
+        let _: ForgotPasswordResponseDTO = try await api.send(req)
     }
     
 }
