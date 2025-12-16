@@ -160,32 +160,23 @@ final class PlanSearchViewController: UIViewController, UITableViewDelegate, UIS
     @objc private func countriesDataUpdated(_ notification: Notification) {
         guard let freshCountries = notification.object as? [CountryRow] else { return }
 
-        // Apply current filters (mode + search query)
+        // Apply mode filter only (search already applied by repository)
         var filtered = freshCountries
-
-        // Mode filter
         if mode == .single {
             filtered = filtered.filter { $0.geography == .local }
         } else {
             filtered = filtered.filter { $0.geography != .local }
         }
 
-        // Search filter (already applied by repository, but re-check for consistency)
-        if !query.isEmpty {
-            let searchTerm = query.lowercased()
-            filtered = filtered.filter { country in
-                country.country_name.lowercased().contains(searchTerm) ||
-                country.country_code.lowercased().contains(searchTerm) ||
-                (country.covered_countries?.contains { $0.lowercased().contains(searchTerm) } ?? false)
-            }
-        }
+        // Update UI only if data actually changed
+        let sorted = filtered.sorted { $0.country_name < $1.country_name }
+        guard sorted.map({ $0.country_code }) != self.rows.map({ $0.country_code }) else { return }
 
-        // Update UI
-        self.rows = filtered.sorted { $0.country_name < $1.country_name }
+        self.rows = sorted
         var snap = NSDiffableDataSourceSnapshot<Section, CountryRow>()
         snap.appendSections([.main])
         snap.appendItems(self.rows, toSection: .main)
-        ds?.apply(snap, animatingDifferences: true)
+        ds?.apply(snap, animatingDifferences: false)
     }
 
     // MARK: - UITableViewDelegate
