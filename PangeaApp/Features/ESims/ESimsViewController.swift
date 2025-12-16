@@ -154,7 +154,6 @@ final class ESimsViewController: UIViewController, UITableViewDelegate {
 
     @objc private func handlePurchaseCompleted() {
         // Wait for backend to process, then reload with retries
-        print("🔔 Purchase completed notification received, will refresh eSIMs list")
         expectingNewESim = true
         // Give backend more time to process before first retry
         DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in
@@ -163,16 +162,19 @@ final class ESimsViewController: UIViewController, UITableViewDelegate {
     }
 
     @objc private func handleDataUpdated(_ notification: Notification) {
-        // Fresh data arrived from network in background
-        print("🔔 eSIMs data updated notification received")
         if let freshData = notification.object as? [ESimRow] {
-            self.esims = freshData.sorted { esim1, esim2 in
+            let sorted = freshData.sorted { esim1, esim2 in
                 if esim1.status == esim2.status {
                     return (esim1.createdAt ?? Date.distantPast) > (esim2.createdAt ?? Date.distantPast)
                 }
                 return esim1.status.rawValue < esim2.status.rawValue
             }
-            self.applySnapshot()
+
+            // Update UI only if data actually changed
+            guard sorted.map({ $0.esimId }) != self.esims.map({ $0.esimId }) else { return }
+
+            self.esims = sorted
+            self.applySnapshot(animated: false)
         }
     }
     
@@ -189,13 +191,11 @@ final class ESimsViewController: UIViewController, UITableViewDelegate {
                     let initialCount = previousCount ?? esims.count
                     shouldRetry = rows.count <= initialCount
                     if shouldRetry {
-                        print("⏳ Waiting for new eSIM to appear... (\(retryCount + 1)/5)")
                     }
                 } else {
                     // Normal load: only retry if empty
                     shouldRetry = rows.isEmpty && retryCount < 3
                     if shouldRetry {
-                        print("⏳ eSIMs list empty, retrying... (\(retryCount + 1)/3)")
                     }
                 }
 
@@ -210,10 +210,8 @@ final class ESimsViewController: UIViewController, UITableViewDelegate {
                     if self.expectingNewESim {
                         let initialCount = previousCount ?? self.esims.count
                         if rows.count > initialCount {
-                            print("✅ New eSIM appeared after \(retryCount) retries")
                             self.expectingNewESim = false
                         } else {
-                            print("⚠️ Still waiting for new eSIM (keeping expectingNewESim flag)")
                         }
                     }
 
@@ -235,11 +233,11 @@ final class ESimsViewController: UIViewController, UITableViewDelegate {
         }
     }
     
-    private func applySnapshot() {
+    private func applySnapshot(animated: Bool = true) {
         var snap = NSDiffableDataSourceSnapshot<Section, ESimRow>()
         snap.appendSections([.main])
         snap.appendItems(esims, toSection: .main)
-        ds.apply(snap, animatingDifferences: true)
+        ds.apply(snap, animatingDifferences: animated)
         
         // Show/hide empty state
         emptyStateView.isHidden = !esims.isEmpty

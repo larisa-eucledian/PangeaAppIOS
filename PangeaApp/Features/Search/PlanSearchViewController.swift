@@ -95,6 +95,14 @@ final class PlanSearchViewController: UIViewController, UITableViewDelegate, UIS
 
             // Video hero
             setupVideoPlayer()
+
+            // Listen for countries data updates from cache
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(countriesDataUpdated(_:)),
+                name: .countriesDataUpdated,
+                object: nil
+            )
            }
 
     @IBAction func modeChanged(_ sender: UISegmentedControl) {
@@ -149,6 +157,28 @@ final class PlanSearchViewController: UIViewController, UITableViewDelegate, UIS
             }
         }
 
+    @objc private func countriesDataUpdated(_ notification: Notification) {
+        guard let freshCountries = notification.object as? [CountryRow] else { return }
+
+        // Apply mode filter only (search already applied by repository)
+        var filtered = freshCountries
+        if mode == .single {
+            filtered = filtered.filter { $0.geography == .local }
+        } else {
+            filtered = filtered.filter { $0.geography != .local }
+        }
+
+        // Update UI only if data actually changed
+        let sorted = filtered.sorted { $0.country_name < $1.country_name }
+        guard sorted.map({ $0.country_code }) != self.rows.map({ $0.country_code }) else { return }
+
+        self.rows = sorted
+        var snap = NSDiffableDataSourceSnapshot<Section, CountryRow>()
+        snap.appendSections([.main])
+        snap.appendItems(self.rows, toSection: .main)
+        ds?.apply(snap, animatingDifferences: false)
+    }
+
     // MARK: - UITableViewDelegate
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         defer { tableView.deselectRow(at: indexPath, animated: true) }
@@ -191,10 +221,11 @@ final class PlanSearchViewController: UIViewController, UITableViewDelegate, UIS
         playerLayer = AVPlayerLayer(player: player)
         playerLayer?.videoGravity = .resizeAspectFill
 
-        // Set frame and explicitly center
-        let bounds = videoContainerView.bounds
-        playerLayer?.frame = bounds
-        playerLayer?.position = CGPoint(x: bounds.midX, y: bounds.midY)
+        // Force layout pass to ensure videoContainerView has correct size
+        videoContainerView.layoutIfNeeded()
+
+        // Set initial frame
+        playerLayer?.frame = videoContainerView.bounds
 
         videoContainerView.layer.addSublayer(playerLayer!)
 
