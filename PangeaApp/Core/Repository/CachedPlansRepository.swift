@@ -201,7 +201,7 @@ final class CachedPlansRepository: PlansRepository {
                 let cached = try context.fetch(fetchRequest)
                 result = cached.compactMap { $0.toCountryRow() }
             } catch {
-                print("Cache fetch error: \(error)")
+                // Fetch error - return empty result
             }
         }
 
