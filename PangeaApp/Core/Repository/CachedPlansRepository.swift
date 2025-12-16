@@ -45,7 +45,6 @@ final class CachedPlansRepository: PlansRepository {
                 let allFresh = try await self?.fetchCountriesFromNetwork(geography: nil, search: nil)
                 guard let allFresh = allFresh, let self = self else { return }
 
-                print("✅ Fetched \(allFresh.count) countries from network (background)")
 
                 // Apply client-side filtering for the notification
                 var filteredFresh = allFresh
@@ -66,18 +65,15 @@ final class CachedPlansRepository: PlansRepository {
                     )
                 }
             } catch {
-                print("⚠️ Background network fetch failed: \(error)")
             }
         }
 
         // 3. Return cached data if available
         if !cached.isEmpty {
-            print("📦 Returning \(cached.count) countries from cache (instant)")
             return cached
         }
 
         // 4. No cache - wait for network (first time only)
-        print("🔄 No cache, waiting for network...")
         let allCountries = try await fetchCountriesFromNetwork(geography: nil, search: nil)
 
         // Apply client-side filtering
@@ -116,7 +112,6 @@ final class CachedPlansRepository: PlansRepository {
                 let fresh = try await self?.fetchPackagesFromNetwork(countryName: countryName)
                 guard let fresh = fresh, let self = self else { return }
 
-                print("✅ Fetched \(fresh.count) packages for \(countryName) from network (background)")
 
                 // Save to in-memory cache (thread-safe write)
                 self.cacheQueue.async(flags: .barrier) {
@@ -131,18 +126,15 @@ final class CachedPlansRepository: PlansRepository {
                     )
                 }
             } catch {
-                print("⚠️ Background network fetch for packages failed: \(error)")
             }
         }
 
         // 3. Return cached data if available
         if let cachedPackages = cached, !cachedPackages.isEmpty {
-            print("📦 Returning \(cachedPackages.count) packages for \(countryName) from cache (instant)")
             return cachedPackages
         }
 
         // 4. No cache - wait for network (first time only)
-        print("🔄 No cache for \(countryName), waiting for network...")
         return try await fetchPackagesFromNetwork(countryName: countryName)
     }
 
@@ -172,14 +164,12 @@ final class CachedPlansRepository: PlansRepository {
                 let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
                 try? context.execute(deleteRequest)
                 self.cacheManager.save()
-                print("🗑️ Cleared countries cache")
             }
         }
 
         // Clear in-memory packages cache
         cacheQueue.async(flags: .barrier) {
             self.packagesCache.removeAll()
-            print("🗑️ Cleared packages cache")
         }
     }
 
@@ -209,9 +199,7 @@ final class CachedPlansRepository: PlansRepository {
 
             do {
                 let cached = try context.fetch(fetchRequest)
-                print("Cache fetch: found \(cached.count) raw entities (geography filter: \(geography?.rawValue ?? "NONE"))")
                 result = cached.compactMap { $0.toCountryRow() }
-                print("Cache fetch: converted to \(result.count) CountryRows")
             } catch {
                 print("Cache fetch error: \(error)")
             }
@@ -288,7 +276,6 @@ final class CachedPlansRepository: PlansRepository {
             // Ignore error, will try to refresh anyway
         }
         
-        print(" Refreshing countries cache...")
         _ = try await fetchCountriesFromNetwork(geography: nil, search: nil)
     }
     
@@ -324,7 +311,6 @@ final class CachedPlansRepository: PlansRepository {
                 }
 
                 self.cacheManager.save()
-                print("✅ Saved \(countries.count) countries to cache")
             }
         }
     }
