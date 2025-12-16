@@ -221,6 +221,12 @@ final class PlanSearchViewController: UIViewController, UITableViewDelegate, UIS
         playerLayer = AVPlayerLayer(player: player)
         playerLayer?.videoGravity = .resizeAspectFill
 
+        // Force layout pass to ensure videoContainerView has correct size
+        videoContainerView.layoutIfNeeded()
+
+        // Set initial frame
+        playerLayer?.frame = videoContainerView.bounds
+
         videoContainerView.layer.addSublayer(playerLayer!)
 
         player?.isMuted = true
