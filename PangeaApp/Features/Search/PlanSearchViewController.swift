@@ -221,11 +221,6 @@ final class PlanSearchViewController: UIViewController, UITableViewDelegate, UIS
         playerLayer = AVPlayerLayer(player: player)
         playerLayer?.videoGravity = .resizeAspectFill
 
-        // Set frame and explicitly center
-        let bounds = videoContainerView.bounds
-        playerLayer?.frame = bounds
-        playerLayer?.position = CGPoint(x: bounds.midX, y: bounds.midY)
-
         videoContainerView.layer.addSublayer(playerLayer!)
 
         player?.isMuted = true
