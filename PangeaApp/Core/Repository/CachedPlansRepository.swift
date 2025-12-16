@@ -53,7 +53,9 @@ final class CachedPlansRepository: PlansRepository {
                     filteredFresh = allFresh.filter { $0.geography == geo }
                 }
                 if let searchTerm = search?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(), !searchTerm.isEmpty {
-                    filteredFresh = filteredFresh.filter { matchesSearch($0, searchTerm: searchTerm) }
+                    filteredFresh = filteredFresh.filter { country in
+                        self?.matchesSearch(country, searchTerm: searchTerm) ?? false
+                    }
                 }
 
                 // Notify observers with filtered data
@@ -84,7 +86,7 @@ final class CachedPlansRepository: PlansRepository {
             filtered = allCountries.filter { $0.geography == geo }
         }
         if let searchTerm = search?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(), !searchTerm.isEmpty {
-            filtered = filtered.filter { matchesSearch($0, searchTerm: searchTerm) }
+            filtered = filtered.filter { self.matchesSearch($0, searchTerm: searchTerm) }
         }
 
         return filtered
@@ -217,7 +219,7 @@ final class CachedPlansRepository: PlansRepository {
 
         // Apply search filter in memory (after conversion to CountryRow)
         if let searchTerm = search?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(), !searchTerm.isEmpty {
-            result = result.filter { matchesSearch($0, searchTerm: searchTerm) }
+            result = result.filter { self.matchesSearch($0, searchTerm: searchTerm) }
         }
 
         return result
@@ -243,7 +245,7 @@ final class CachedPlansRepository: PlansRepository {
         
         // Client-side search filtering (same as RealPlansRepository)
         if let searchTerm = search?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(), !searchTerm.isEmpty {
-            countries = countries.filter { matchesSearch($0, searchTerm: searchTerm) }
+            countries = countries.filter { self.matchesSearch($0, searchTerm: searchTerm) }
         }
         
         // Save to cache in background
