@@ -53,11 +53,7 @@ final class CachedPlansRepository: PlansRepository {
                     filteredFresh = allFresh.filter { $0.geography == geo }
                 }
                 if let searchTerm = search?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(), !searchTerm.isEmpty {
-                    filteredFresh = filteredFresh.filter { country in
-                        country.country_name.lowercased().contains(searchTerm) ||
-                        country.country_code.lowercased().contains(searchTerm) ||
-                        (country.covered_countries?.contains { $0.lowercased().contains(searchTerm) } ?? false)
-                    }
+                    filteredFresh = filteredFresh.filter { matchesSearch($0, searchTerm: searchTerm) }
                 }
 
                 // Notify observers with filtered data
@@ -88,11 +84,7 @@ final class CachedPlansRepository: PlansRepository {
             filtered = allCountries.filter { $0.geography == geo }
         }
         if let searchTerm = search?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(), !searchTerm.isEmpty {
-            filtered = filtered.filter { country in
-                country.country_name.lowercased().contains(searchTerm) ||
-                country.country_code.lowercased().contains(searchTerm) ||
-                (country.covered_countries?.contains { $0.lowercased().contains(searchTerm) } ?? false)
-            }
+            filtered = filtered.filter { matchesSearch($0, searchTerm: searchTerm) }
         }
 
         return filtered
@@ -210,11 +202,6 @@ final class CachedPlansRepository: PlansRepository {
                 predicates.append(NSPredicate(format: "geography == %@", geo.rawValue))
             }
 
-            // Search filter
-            if let searchText = search?.lowercased(), !searchText.isEmpty {
-                predicates.append(NSPredicate(format: "countryName CONTAINS[cd] %@", searchText))
-            }
-
             fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
             fetchRequest.sortDescriptors = [NSSortDescriptor(key: "countryName", ascending: true)]
 
@@ -226,6 +213,11 @@ final class CachedPlansRepository: PlansRepository {
             } catch {
                 print("Cache fetch error: \(error)")
             }
+        }
+
+        // Apply search filter in memory (after conversion to CountryRow)
+        if let searchTerm = search?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(), !searchTerm.isEmpty {
+            result = result.filter { matchesSearch($0, searchTerm: searchTerm) }
         }
 
         return result
@@ -251,11 +243,7 @@ final class CachedPlansRepository: PlansRepository {
         
         // Client-side search filtering (same as RealPlansRepository)
         if let searchTerm = search?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(), !searchTerm.isEmpty {
-            countries = countries.filter { country in
-                country.country_name.lowercased().contains(searchTerm) ||
-                country.country_code.lowercased().contains(searchTerm) ||
-                (country.covered_countries?.contains { $0.lowercased().contains(searchTerm) } ?? false)
-            }
+            countries = countries.filter { matchesSearch($0, searchTerm: searchTerm) }
         }
         
         // Save to cache in background
@@ -387,5 +375,46 @@ extension CachedCountry {
             covered_countries: covered,
             packageCount: Int(packageCount)
         )
+    }
+
+    // MARK: - Search Helper
+
+    private func countryName(for countryCode: String) -> String {
+        let code = countryCode.uppercased()
+        let locale = Locale.current
+        return locale.localizedString(forRegionCode: code) ?? code
+    }
+
+    private func matchesSearch(_ country: CountryRow, searchTerm: String) -> Bool {
+        // 1. Search in country name
+        if country.country_name.lowercased().contains(searchTerm) {
+            return true
+        }
+
+        // 2. Search in country code
+        if country.country_code.lowercased().contains(searchTerm) {
+            return true
+        }
+
+        // 3. Search in localized country name
+        let localizedName = countryName(for: country.country_code)
+        if localizedName.lowercased().contains(searchTerm) {
+            return true
+        }
+
+        // 4. Search in covered countries (codes and localized names)
+        if let coveredCountries = country.covered_countries {
+            for code in coveredCountries {
+                if code.lowercased().contains(searchTerm) {
+                    return true
+                }
+                let name = countryName(for: code)
+                if name.lowercased().contains(searchTerm) {
+                    return true
+                }
+            }
+        }
+
+        return false
     }
 }

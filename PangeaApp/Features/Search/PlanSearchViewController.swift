@@ -95,6 +95,14 @@ final class PlanSearchViewController: UIViewController, UITableViewDelegate, UIS
 
             // Video hero
             setupVideoPlayer()
+
+            // Listen for countries data updates from cache
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(countriesDataUpdated(_:)),
+                name: .countriesDataUpdated,
+                object: nil
+            )
            }
 
     @IBAction func modeChanged(_ sender: UISegmentedControl) {
@@ -148,6 +156,37 @@ final class PlanSearchViewController: UIViewController, UITableViewDelegate, UIS
                 }
             }
         }
+
+    @objc private func countriesDataUpdated(_ notification: Notification) {
+        guard let freshCountries = notification.object as? [CountryRow] else { return }
+
+        // Apply current filters (mode + search query)
+        var filtered = freshCountries
+
+        // Mode filter
+        if mode == .single {
+            filtered = filtered.filter { $0.geography == .local }
+        } else {
+            filtered = filtered.filter { $0.geography != .local }
+        }
+
+        // Search filter (already applied by repository, but re-check for consistency)
+        if !query.isEmpty {
+            let searchTerm = query.lowercased()
+            filtered = filtered.filter { country in
+                country.country_name.lowercased().contains(searchTerm) ||
+                country.country_code.lowercased().contains(searchTerm) ||
+                (country.covered_countries?.contains { $0.lowercased().contains(searchTerm) } ?? false)
+            }
+        }
+
+        // Update UI
+        self.rows = filtered.sorted { $0.country_name < $1.country_name }
+        var snap = NSDiffableDataSourceSnapshot<Section, CountryRow>()
+        snap.appendSections([.main])
+        snap.appendItems(self.rows, toSection: .main)
+        ds?.apply(snap, animatingDifferences: true)
+    }
 
     // MARK: - UITableViewDelegate
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
