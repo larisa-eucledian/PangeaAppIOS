@@ -54,7 +54,7 @@ final class CachedPlansRepository: PlansRepository {
                 }
                 if let searchTerm = search?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(), !searchTerm.isEmpty {
                     filteredFresh = filteredFresh.filter { country in
-                        self?.matchesSearch(country, searchTerm: searchTerm) ?? false
+                        self.matchesSearch(country, searchTerm: searchTerm)
                     }
                 }
 
@@ -330,53 +330,13 @@ final class CachedPlansRepository: PlansRepository {
     }
     
     // MARK: - Response DTOs
-    
+
     private struct CountriesResponseDTO: Decodable {
         let data: [CountryRow]
     }
-    
+
     private struct PackagesResponseDTO: Decodable {
         let data: [PackageRow]
-    }
-}
-
-// MARK: - CachedCountry Extension
-
-extension CachedCountry {
-    func toCountryRow() -> CountryRow? {
-        guard let name = countryName,
-              let code = countryCode,
-              let geo = geography else {
-            return nil
-        }
-        
-        let geographyEnum = Geography(rawValue: geo) ?? .local
-        
-        // Decode covered countries
-        var covered: [String]? = nil
-        if let coveredString = coveredCountries,
-           let data = Data(base64Encoded: coveredString) {
-            covered = try? JSONDecoder().decode([String].self, from: data)
-        }
-        
-        return CountryRow(
-            id: 0, // Not cached
-            documentId: code, // Use country code as ID
-            country_code: code,
-            country_name: name,
-            createdAt: nil,
-            updatedAt: nil,
-            publishedAt: nil,
-            locale: nil,
-            region: nil,
-            image_url: imageURL,
-            languages: nil,
-            currencies: nil,
-            callingCodes: nil,
-            geography: geographyEnum,
-            covered_countries: covered,
-            packageCount: Int(packageCount)
-        )
     }
 
     // MARK: - Search Helper
@@ -418,5 +378,45 @@ extension CachedCountry {
         }
 
         return false
+    }
+}
+
+// MARK: - CachedCountry Extension
+
+extension CachedCountry {
+    func toCountryRow() -> CountryRow? {
+        guard let name = countryName,
+              let code = countryCode,
+              let geo = geography else {
+            return nil
+        }
+        
+        let geographyEnum = Geography(rawValue: geo) ?? .local
+        
+        // Decode covered countries
+        var covered: [String]? = nil
+        if let coveredString = coveredCountries,
+           let data = Data(base64Encoded: coveredString) {
+            covered = try? JSONDecoder().decode([String].self, from: data)
+        }
+        
+        return CountryRow(
+            id: 0, // Not cached
+            documentId: code, // Use country code as ID
+            country_code: code,
+            country_name: name,
+            createdAt: nil,
+            updatedAt: nil,
+            publishedAt: nil,
+            locale: nil,
+            region: nil,
+            image_url: imageURL,
+            languages: nil,
+            currencies: nil,
+            callingCodes: nil,
+            geography: geographyEnum,
+            covered_countries: covered,
+            packageCount: Int(packageCount)
+        )
     }
 }
