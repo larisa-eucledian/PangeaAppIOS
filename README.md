@@ -1,4 +1,6 @@
 # 📱 PangeaApp — Borderless Connection  
+URL Repositorio: https://github.com/larisa-eucledian/PangeaAppIOS
+
 _Ecommerce de travel eSIMs para iOS_
 
 ![Platform](https://img.shields.io/badge/platform-iOS-blue)
